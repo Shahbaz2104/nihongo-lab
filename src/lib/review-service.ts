@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { getVocab, getKanji, getGrammar, getKana, type JlptLevel } from "@/lib/datasets";
 import { newCardState, reviewCard, type Grade } from "@/lib/srs";
+import { tokenize } from "@/lib/tokenizer";
 
 export type CardType = "vocab" | "kanji" | "kana" | "grammar";
 
@@ -18,6 +19,13 @@ const dayStart = (d: Date) => {
   return dt.toISOString().slice(0, 10);
 };
 
+function furiganaLine(jp: string): string {
+  return tokenize(jp)
+    .map((t) => t.reading)
+    .filter(Boolean)
+    .join(" ");
+}
+
 function datasetEntries(type: CardType, level?: JlptLevel): DatasetEntry[] {
   switch (type) {
     case "vocab": {
@@ -28,7 +36,7 @@ function datasetEntries(type: CardType, level?: JlptLevel): DatasetEntry[] {
         back: (v.meanings ?? []).join("; ") || v.word,
         reading: v.reading || null,
         example: v.examples?.[0]?.ja ?? null,
-        exampleFuri: null,
+        exampleFuri: v.examples?.[0]?.ja ? furiganaLine(v.examples[0].ja) : null,
       }));
     }
     case "kanji": {

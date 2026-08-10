@@ -9,6 +9,7 @@ const links = [
   { href: "/kana", label: "Kana", kanji: "かな" },
   { href: "/kanji", label: "Kanji", kanji: "漢字" },
   { href: "/vocab", label: "Vocab", kanji: "単語" },
+  { href: "/stories", label: "Stories", kanji: "物語" },
   { href: "/grammar", label: "Grammar", kanji: "文法" },
   { href: "/quiz", label: "Quiz", kanji: "クイズ" },
   { href: "/stats", label: "Stats", kanji: "統計" },

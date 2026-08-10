@@ -1,0 +1,151 @@
+[
+  {
+    "id": "cafe",
+    "title": "喫茶店で",
+    "titleEn": "At the Café",
+    "level": "N5",
+    "turns": [
+      {
+        "speaker": "店員",
+        "jp": "いらっしゃいませ。何にしますか。",
+        "en": "Welcome. What would you like?"
+      },
+      {
+        "speaker": "あなた",
+        "jp": "",
+        "en": "",
+        "correct": 0,
+        "options": [
+          { "jp": "コーヒーをください。", "en": "Coffee, please." },
+          { "jp": "おはようございます。", "en": "Good morning." },
+          { "jp": "いただきます。", "en": "Thank you for the meal (before eating)." }
+        ]
+      },
+      {
+        "speaker": "店員",
+        "jp": "コーヒーでよろしいですか。",
+        "en": "Is coffee okay?"
+      },
+      {
+        "speaker": "あなた",
+        "jp": "",
+        "en": "",
+        "correct": 1,
+        "options": [
+          { "jp": "ごちそうさまでした。", "en": "Thanks for the meal (after eating)." },
+          { "jp": "はい、お願いします。", "en": "Yes, please." },
+          { "jp": "こんばんは。", "en": "Good evening." }
+        ]
+      },
+      {
+        "speaker": "店員",
+        "jp": "ホットとアイス、どちらにしますか。",
+        "en": "Hot or iced, which would you like?"
+      },
+      {
+        "speaker": "あなた",
+        "jp": "",
+        "en": "",
+        "correct": 2,
+        "options": [
+          { "jp": "お会計をお願いします。", "en": "The check, please." },
+          { "jp": "お元気ですか。", "en": "How are you?" },
+          { "jp": "ホットでお願いします。", "en": "Hot, please." }
+        ]
+      },
+      {
+        "speaker": "店員",
+        "jp": "どうぞ。",
+        "en": "Here you go."
+      },
+      {
+        "speaker": "あなた",
+        "jp": "",
+        "en": "",
+        "correct": 0,
+        "options": [
+          { "jp": "ありがとうございます。", "en": "Thank you." },
+          { "jp": "すみません。", "en": "Excuse me / sorry." },
+          { "jp": "いただきます。", "en": "Let me eat." }
+        ]
+      },
+      {
+        "speaker": "店員",
+        "jp": "どうぞ、ごゆっくり。",
+        "en": "Please, take your time."
+      }
+    ]
+  },
+  {
+    "id": "self-intro",
+    "title": "自己紹介",
+    "titleEn": "Self-introduction",
+    "level": "N5",
+    "turns": [
+      {
+        "speaker": "田中",
+        "jp": "はじめまして、田中です。",
+        "en": "Nice to meet you, I'm Tanaka."
+      },
+      {
+        "speaker": "あなた",
+        "jp": "",
+        "en": "",
+        "correct": 2,
+        "options": [
+          { "jp": "さようなら。", "en": "Goodbye." },
+          { "jp": "いただきます。", "en": "Let me eat." },
+          { "jp": "はじめまして、私はサラです。", "en": "Nice to meet you, I'm Sara." }
+        ]
+      },
+      {
+        "speaker": "田中",
+        "jp": "お国はどちらですか。",
+        "en": "Where are you from?"
+      },
+      {
+        "speaker": "あなた",
+        "jp": "",
+        "en": "",
+        "correct": 0,
+        "options": [
+          { "jp": "アメリカから来ました。", "en": "I came from America." },
+          { "jp": "これは本です。", "en": "This is a book." },
+          { "jp": "おやすみなさい。", "en": "Good night." }
+        ]
+      },
+      {
+        "speaker": "田中",
+        "jp": "日本語が上手ですね。",
+        "en": "Your Japanese is good."
+      },
+      {
+        "speaker": "あなた",
+        "jp": "",
+        "en": "",
+        "correct": 1,
+        "options": [
+          { "jp": "はい、わかりました。", "en": "Yes, I understand." },
+          { "jp": "いいえ、まだ下手です。", "en": "No, I'm still not good at it." },
+          { "jp": "ごめんなさい。", "en": "I'm sorry." }
+        ]
+      },
+      {
+        "speaker": "田中",
+        "jp": "また会いましょう。",
+        "en": "Let's meet again."
+      },
+      {
+        "speaker": "あなた",
+        "jp": "",
+        "en": "",
+        "correct": 2,
+        "options": [
+          { "jp": "おはようございます。", "en": "Good morning." },
+          { "jp": "どういたしまして。", "en": "You're welcome." },
+          { "jp": "はい、また会いましょう。", "en": "Yes, let's meet again." }
+        ]
+      }
+    ]
+  }
+]

@@ -15,17 +15,24 @@ if (typeof window !== "undefined") {
   });
 }
 
-export function speakJapanese(text: string, rate = 0.85) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  ensureVoices();
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  const jpVoice =
-    voices.find((v) => v.lang.startsWith("ja") && v.default) ??
-    voices.find((v) => v.lang === "ja-JP") ??
-    voices.find((v) => v.lang.startsWith("ja"));
-  if (jpVoice) utter.voice = jpVoice;
-  utter.lang = jpVoice?.lang ?? "ja-JP";
-  utter.rate = rate;
-  window.speechSynthesis.speak(utter);
+export function speakJapanese(text: string, rate = 0.85): Promise<void> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      resolve();
+      return;
+    }
+    ensureVoices();
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    const jpVoice =
+      voices.find((v) => v.lang.startsWith("ja") && v.default) ??
+      voices.find((v) => v.lang === "ja-JP") ??
+      voices.find((v) => v.lang.startsWith("ja"));
+    if (jpVoice) utter.voice = jpVoice;
+    utter.lang = jpVoice?.lang ?? "ja-JP";
+    utter.rate = rate;
+    utter.onend = () => resolve();
+    utter.onerror = () => resolve();
+    window.speechSynthesis.speak(utter);
+  });
 }

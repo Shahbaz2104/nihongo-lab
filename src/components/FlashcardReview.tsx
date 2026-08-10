@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { api, type Grade, type ReviewCard } from "@/lib/api";
 import { speakJapanese } from "@/lib/tts";
+import { Furigana } from "@/components/Furigana";
 
 interface Props {
   type: string;
@@ -127,7 +128,11 @@ export function FlashcardReview({ type, level, limit = 20, onRestart }: Props) {
             className="flex min-h-64 w-full cursor-pointer flex-col items-center justify-center gap-4 px-8 py-10"
           >
             <div className={`font-jp text-6xl font-bold tracking-wide ${isKanjiType ? "text-accent" : ""}`}>
-              {card.front}
+              {card.type === "vocab" ? (
+                <Furigana word={card.front} reading={card.reading} />
+              ) : (
+                card.front
+              )}
             </div>
             {!revealed && (
               <div className="text-xs uppercase tracking-widest text-muted">tap to reveal</div>

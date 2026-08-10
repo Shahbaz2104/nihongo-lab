@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { VocabItem } from "@/lib/datasets";
 import { speakJapanese } from "@/lib/tts";
+import { Furigana } from "@/components/Furigana";
 
 export function VocabBrowser({ levels }: { levels: Record<string, VocabItem[]> }) {
   const [level, setLevel] = useState("N5");
@@ -56,7 +57,9 @@ export function VocabBrowser({ levels }: { levels: Record<string, VocabItem[]> }
               🔊
             </button>
             <div className="w-32 shrink-0">
-              <div className="font-jp text-lg leading-tight">{v.word}</div>
+              <div className="font-jp text-lg leading-tight">
+                <Furigana word={v.word} reading={v.reading} />
+              </div>
               <div className="text-xs text-muted">{v.reading}</div>
             </div>
             <div className="min-w-0 flex-1 text-sm">{v.meanings.join("; ")}</div>

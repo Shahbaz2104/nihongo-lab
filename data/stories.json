@@ -1,0 +1,98 @@
+[
+  {
+    "id": "morning",
+    "title": "朝の習慣",
+    "titleEn": "Morning Routine",
+    "level": "N5",
+    "sentences": [
+      {
+        "jp": "私は毎朝六時に起きます。",
+        "en": "I wake up at six every morning."
+      },
+      {
+        "jp": "顔を洗って、歯を磨きます。",
+        "en": "I wash my face and brush my teeth."
+      },
+      {
+        "jp": "朝ごはんにパンと牛乳を食べます。",
+        "en": "For breakfast, I eat bread and drink milk."
+      },
+      {
+        "jp": "七時半に学校へ行きます。",
+        "en": "I go to school at half past seven."
+      },
+      {
+        "jp": "学校は八時から始まります。",
+        "en": "School starts at eight o'clock."
+      },
+      {
+        "jp": "昼ごはんは友達と一緒に食べます。",
+        "en": "I eat lunch together with my friends."
+      }
+    ]
+  },
+  {
+    "id": "day-off",
+    "title": "休みの日",
+    "titleEn": "Day Off",
+    "level": "N5",
+    "sentences": [
+      {
+        "jp": "日曜日に私は公園へ行きました。",
+        "en": "On Sunday, I went to the park."
+      },
+      {
+        "jp": "公園で犬と散歩しました。",
+        "en": "I took a walk with my dog in the park."
+      },
+      {
+        "jp": "天気がとても良かったです。",
+        "en": "The weather was very nice."
+      },
+      {
+        "jp": "ベンチに座って、本を読みました。",
+        "en": "I sat on a bench and read a book."
+      },
+      {
+        "jp": "帰りにコンビニで水を買いました。",
+        "en": "On the way home, I bought some water at the convenience store."
+      },
+      {
+        "jp": "とても楽しい一日でした。",
+        "en": "It was a very fun day."
+      }
+    ]
+  },
+  {
+    "id": "studying-japanese",
+    "title": "日本語の勉強",
+    "titleEn": "Studying Japanese",
+    "level": "N5",
+    "sentences": [
+      {
+        "jp": "私は毎日日本語を勉強しています。",
+        "en": "I study Japanese every day."
+      },
+      {
+        "jp": "新しい単語をたくさん覚えます。",
+        "en": "I memorize a lot of new words."
+      },
+      {
+        "jp": "日本語は難しいですが、とても面白いです。",
+        "en": "Japanese is difficult, but very interesting."
+      },
+      {
+        "jp": "友達と日本語で話します。",
+        "en": "I speak Japanese with my friend."
+      },
+      {
+        "jp": "いつか日本へ行きたいです。",
+        "en": "Someday, I want to go to Japan."
+      },
+      {
+        "jp": "日本語が上手になりたいです。",
+        "en": "I want to become good at Japanese."
+      }
+    ]
+  }
+]
