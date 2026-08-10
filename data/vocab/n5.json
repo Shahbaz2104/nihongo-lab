@@ -15,7 +15,8 @@
         "ja": "あさってはトムの誕生日だ。",
         "en": "The day after tomorrow is Tom's birthday."
       }
-    ]
+    ],
+    "kanji": "明後日"
   },
   {
     "word": "あそこ",
@@ -132,7 +133,8 @@
       "to bathe",
       "to shower"
     ],
-    "level": "N5"
+    "level": "N5",
+    "kanji": "浴びる"
   },
   {
     "word": "あまり",
@@ -413,7 +415,8 @@
         "ja": "バナナおいしい。",
         "en": "Bananas are delicious."
       }
-    ]
+    ],
+    "kanji": "美味しい"
   },
   {
     "word": "おなか",
@@ -431,7 +434,8 @@
         "ja": "おなかが痛い。",
         "en": "My stomach hurts."
       }
-    ]
+    ],
+    "kanji": "お腹"
   },
   {
     "word": "おばあさん",
@@ -450,7 +454,8 @@
         "ja": "おばあさんが隣に越してきた。",
         "en": "An old lady moved into the place next door."
       }
-    ]
+    ],
+    "kanji": "お祖母さん"
   },
   {
     "word": "おまわりさん",
@@ -468,7 +473,8 @@
         "ja": "おまわりさんに道を尋ねなさい。",
         "en": "Ask the policeman the way."
       }
-    ]
+    ],
+    "kanji": "お巡りさん"
   },
   {
     "word": "おもしろい",
@@ -486,7 +492,8 @@
         "ja": "その映画はおもしろい。",
         "en": "That movie is exciting."
       }
-    ]
+    ],
+    "kanji": "面白い"
   },
   {
     "word": "お菓子",
@@ -723,7 +730,8 @@
         "ja": "壁にもたれかかるな。",
         "en": "Don't lean against the wall."
       }
-    ]
+    ],
+    "kanji": "掛かる"
   },
   {
     "word": "かぎ",
@@ -741,7 +749,8 @@
         "ja": "旅は若いうちにかぎります。",
         "en": "There is nothing better than travelling while young."
       }
-    ]
+    ],
+    "kanji": "鍵"
   },
   {
     "word": "かける",
@@ -759,7 +768,8 @@
         "ja": "話しかけるな。",
         "en": "Don't talk to me."
       }
-    ]
+    ],
+    "kanji": "掛ける"
   },
   {
     "word": "カップ",
@@ -796,7 +806,8 @@
         "ja": "私のかばんです。",
         "en": "This is my bag."
       }
-    ]
+    ],
+    "kanji": "鞄"
   },
   {
     "word": "カメラ",
@@ -868,7 +879,8 @@
         "ja": "かわいいよね？",
         "en": "It's pretty, isn't it?"
       }
-    ]
+    ],
+    "kanji": "可愛い"
   },
   {
     "word": "ギター",
@@ -905,7 +917,8 @@
         "ja": "月がきれいよ。",
         "en": "The moon is beautiful."
       }
-    ]
+    ],
+    "kanji": "綺麗"
   },
   {
     "word": "キロ/キログラム",
@@ -939,7 +952,8 @@
         "ja": "水をください。",
         "en": "Please give me some water."
       }
-    ]
+    ],
+    "kanji": "下さい"
   },
   {
     "word": "クラス",
@@ -1252,7 +1266,8 @@
     "meanings": [
       "soy sauce"
     ],
-    "level": "N5"
+    "level": "N5",
+    "kanji": "醤油"
   },
   {
     "word": "スカート",
@@ -1640,7 +1655,8 @@
         "ja": "たくさん欲しい。",
         "en": "I want a lot."
       }
-    ]
+    ],
+    "kanji": "沢山"
   },
   {
     "word": "タクシー",
@@ -1677,7 +1693,8 @@
         "ja": "彼は腹をたてた。",
         "en": "He became irritated."
       }
-    ]
+    ],
+    "kanji": "縦"
   },
   {
     "word": "たばこ",
@@ -1732,7 +1749,8 @@
         "ja": "だんだん腹立ってきた。",
         "en": "Little by little I'm getting angry."
       }
-    ]
+    ],
+    "kanji": "段々"
   },
   {
     "word": "ちゃわん",
@@ -1740,7 +1758,8 @@
     "meanings": [
       "rice bowl"
     ],
-    "level": "N5"
+    "level": "N5",
+    "kanji": "茶碗"
   },
   {
     "word": "ちょうど",
@@ -1794,7 +1813,8 @@
         "ja": "日記をつける。",
         "en": "I keep a diary."
       }
-    ]
+    ],
+    "kanji": "付ける"
   },
   {
     "word": "つまらない",
@@ -1812,7 +1832,8 @@
         "ja": "彼はつまらない男だ。",
         "en": "He's nothing."
       }
-    ]
+    ],
+    "kanji": "詰まらない"
   },
   {
     "word": "テープ",
@@ -2400,7 +2421,8 @@
         "ja": "彼はくつをみがいた。",
         "en": "He shined his shoes."
       }
-    ]
+    ],
+    "kanji": "穿く"
   },
   {
     "word": "はし",
@@ -2418,7 +2440,8 @@
         "ja": "釣りはしますか？",
         "en": "Do you fish?"
       }
-    ]
+    ],
+    "kanji": "箸"
   },
   {
     "word": "バス",
@@ -2562,7 +2585,8 @@
         "ja": "私は毎日１回おふろに入ります。",
         "en": "I have a bath every day."
       }
-    ]
+    ],
+    "kanji": "風呂"
   },
   {
     "word": "ページ",
@@ -2761,7 +2785,8 @@
         "ja": "彼等はほんとうに勝ったのです。",
         "en": "They did win."
       }
-    ]
+    ],
+    "kanji": "本当"
   },
   {
     "word": "まずい",
@@ -2779,7 +2804,8 @@
         "ja": "私はひざまずいた。",
         "en": "I kneeled down."
       }
-    ]
+    ],
+    "kanji": "不味い"
   },
   {
     "word": "また",
@@ -2872,7 +2898,8 @@
         "ja": "みんなはどこ？",
         "en": "Where is everybody?"
       }
-    ]
+    ],
+    "kanji": "皆"
   },
   {
     "word": "メートル",
@@ -2962,7 +2989,8 @@
         "ja": "明日やるの？",
         "en": "Will you be doing that tomorrow?"
       }
-    ]
+    ],
+    "kanji": "遣る"
   },
   {
     "word": "ゆっくりと",
@@ -3051,7 +3079,8 @@
         "ja": "彼はりっぱな若者になった。",
         "en": "He became a handsome young man."
       }
-    ]
+    ],
+    "kanji": "立派"
   },
   {
     "word": "レコード",

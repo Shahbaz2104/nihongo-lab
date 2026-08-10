@@ -89,7 +89,8 @@
         "ja": "彼はあした来るかな。",
         "en": "I wonder if he'll come tomorrow."
       }
-    ]
+    ],
+    "kanji": "明日"
   },
   {
     "word": "あちこち",
@@ -148,7 +149,8 @@
         "ja": "あと一日だ。",
         "en": "One more day to go."
       }
-    ]
+    ],
+    "kanji": "後"
   },
   {
     "word": "あらゆる",
@@ -342,7 +344,8 @@
         "ja": "彼はいたずらっ子だ。",
         "en": "He is a naughty boy."
       }
-    ]
+    ],
+    "kanji": "悪戯"
   },
   {
     "word": "いただきます",
@@ -379,7 +382,8 @@
         "ja": "泣いちゃいそう！",
         "en": "I'm about to cry!"
       }
-    ]
+    ],
+    "kanji": "一"
   },
   {
     "word": "いつか",
@@ -593,7 +597,8 @@
         "ja": "その後どうなるの？",
         "en": "What happens afterwards?"
       }
-    ]
+    ],
+    "kanji": "唸る"
   },
   {
     "word": "うまい",
@@ -611,7 +616,8 @@
         "ja": "もう言うまい。",
         "en": "I'll say no more."
       }
-    ]
+    ],
+    "kanji": "上手い"
   },
   {
     "word": "うるさい",
@@ -631,7 +637,8 @@
         "ja": "トムは口うるさい。",
         "en": "Tom is picky."
       }
-    ]
+    ],
+    "kanji": "煩い"
   },
   {
     "word": "うん",
@@ -724,7 +731,8 @@
         "ja": "彼のおじいさんは何歳かしら。",
         "en": "How old might his grandfather be?"
       }
-    ]
+    ],
+    "kanji": "お祖父さん"
   },
   {
     "word": "おしゃべり",
@@ -744,7 +752,8 @@
         "ja": "メグはおしゃべりだ。",
         "en": "Meg talks too much."
       }
-    ]
+    ],
+    "kanji": "お喋り"
   },
   {
     "word": "おそらく",
@@ -1033,7 +1042,8 @@
         "ja": "かわいそうに。",
         "en": "I feel sorry for him."
       }
-    ]
+    ],
+    "kanji": "可哀想"
   },
   {
     "word": "かわいらしい",
@@ -1052,7 +1062,8 @@
         "ja": "彼女はとてもかわいらしい。",
         "en": "She is as pretty as anything."
       }
-    ]
+    ],
+    "kanji": "可愛らしい"
   },
   {
     "word": "きちんと",
@@ -1854,7 +1865,8 @@
         "ja": "彼はよくしゃべる。",
         "en": "He talks a lot."
       }
-    ]
+    ],
+    "kanji": "喋る"
   },
   {
     "word": "ジュース",
@@ -1969,7 +1981,8 @@
         "ja": "すごいですね。",
         "en": "It's amazing."
       }
-    ]
+    ],
+    "kanji": "凄い"
   },
   {
     "word": "スター",
@@ -2064,7 +2077,8 @@
         "ja": "なんてすてきな衣装だ。",
         "en": "What a darling outfit!"
       }
-    ]
+    ],
+    "kanji": "素敵"
   },
   {
     "word": "すなわち",
@@ -2618,7 +2632,8 @@
         "ja": "死はよく眠りにたとえられる。",
         "en": "Death is often compared to sleep."
       }
-    ]
+    ],
+    "kanji": "例え"
   },
   {
     "word": "たびたび",
@@ -3346,7 +3361,8 @@
         "ja": "なかなかの学者だ。",
         "en": "He is very much a scholar."
       }
-    ]
+    ],
+    "kanji": "中々"
   },
   {
     "word": "なぜなら",
@@ -3592,7 +3608,8 @@
         "ja": "そのはさみは切れない。",
         "en": "The scissors are not sharp."
       }
-    ]
+    ],
+    "kanji": "鋏"
   },
   {
     "word": "パス",
@@ -4663,7 +4680,8 @@
         "ja": "彼女はわがままな人だ。",
         "en": "She is a selfish person."
       }
-    ]
+    ],
+    "kanji": "我儘"
   },
   {
     "word": "わざと",
@@ -4681,7 +4699,8 @@
         "ja": "それって、わざと？",
         "en": "Is that on purpose?"
       }
-    ]
+    ],
+    "kanji": "態と"
   },
   {
     "word": "哀れ",

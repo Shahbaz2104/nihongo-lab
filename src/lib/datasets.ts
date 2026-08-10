@@ -12,6 +12,7 @@ export interface VocabItem {
   meanings: string[];
   level: JlptLevel;
   examples: { ja: string; en: string }[];
+  kanji?: string;
 }
 
 export interface KanjiItem {

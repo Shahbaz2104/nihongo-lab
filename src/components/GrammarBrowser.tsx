@@ -2,9 +2,15 @@
 
 import { useMemo, useState } from "react";
 import type { GrammarItem } from "@/lib/datasets";
+import type { AnnotatedExample } from "@/lib/annotate";
 import { speakJapanese } from "@/lib/tts";
+import { RubyText } from "@/components/RubyText";
 
-export function GrammarBrowser({ levels }: { levels: Record<string, GrammarItem[]> }) {
+interface Row extends Omit<GrammarItem, "examples"> {
+  examples: AnnotatedExample[];
+}
+
+export function GrammarBrowser({ levels }: { levels: Record<string, Row[]> }) {
   const [level, setLevel] = useState("N5");
 
   const items = useMemo(() => levels[level] ?? [], [levels, level]);
@@ -37,18 +43,22 @@ export function GrammarBrowser({ levels }: { levels: Record<string, GrammarItem[
             </div>
             {g.formation && <div className="mt-2 text-xs text-muted">{g.formation}</div>}
             {g.examples.length > 0 && (
-              <div className="mt-3 rounded-xl bg-panel-2 p-4">
+              <div className="mt-3 space-y-2 rounded-xl bg-panel-2 p-4">
                 {g.examples.slice(0, 2).map((ex, i) => (
                   <div key={i} className="flex items-start gap-2 py-1">
                     <button
                       onClick={() => speakJapanese(ex.ja)}
                       className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded border border-line text-[10px] text-muted transition-colors hover:border-accent hover:text-accent"
+                      aria-label="Speak example"
                     >
                       🔊
                     </button>
-                    <div>
-                      <div className="font-jp">{ex.ja}</div>
-                      <div className="text-xs text-muted">{ex.en}</div>
+                    <div className="min-w-0">
+                      <div className="font-jp text-base">
+                        <RubyText tokens={ex.tokens} />
+                      </div>
+                      <div className="mt-0.5 text-[11px] text-muted italic">{ex.romaji}</div>
+                      <div className="mt-0.5 text-xs text-muted">{ex.en}</div>
                     </div>
                   </div>
                 ))}

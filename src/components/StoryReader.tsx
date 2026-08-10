@@ -100,7 +100,7 @@ function StoryView({ story }: { story: Story }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
-            className="group rounded-2xl border border-line bg-panel p-4"
+            className="rounded-2xl border border-line bg-panel p-4 transition-colors hover:border-accent/40"
           >
             <div className="flex items-start gap-3">
               <span className="mt-1 w-6 shrink-0 text-right text-xs tabular-nums text-muted">

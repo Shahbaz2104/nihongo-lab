@@ -41,7 +41,8 @@
     "meanings": [
       "to greet"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "挨拶する"
   },
   {
     "word": "あかちゃん",
@@ -59,7 +60,8 @@
         "ja": "あかちゃんがいるときはたばこを御遠慮下さい。",
         "en": "Would you please refrain from smoking when babies are here?"
       }
-    ]
+    ],
+    "kanji": "赤ちゃん"
   },
   {
     "word": "アクセサリー",
@@ -95,7 +97,8 @@
         "ja": "待ってあげる。",
         "en": "I'll wait for you."
       }
-    ]
+    ],
+    "kanji": "上げる"
   },
   {
     "word": "アジア",
@@ -239,7 +242,8 @@
         "ja": "いじめるのはやめて！",
         "en": "Stop bullying me!"
       }
-    ]
+    ],
+    "kanji": "虐める"
   },
   {
     "word": "いただく",
@@ -247,7 +251,8 @@
     "meanings": [
       "(humble) to receive"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "頂く"
   },
   {
     "word": "いっぱい",
@@ -292,7 +297,8 @@
     "meanings": [
       "to visit"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "伺う"
   },
   {
     "word": "うそ",
@@ -310,7 +316,8 @@
         "ja": "嘘うそつくな！",
         "en": "Don't lie!"
       }
-    ]
+    ],
+    "kanji": "嘘"
   },
   {
     "word": "うち",
@@ -328,7 +335,8 @@
         "ja": "うちにいます。",
         "en": "I am at home."
       }
-    ]
+    ],
+    "kanji": "家"
   },
   {
     "word": "うまい",
@@ -346,7 +354,8 @@
         "ja": "もう言うまい。",
         "en": "I'll say no more."
       }
-    ]
+    ],
+    "kanji": "上手い"
   },
   {
     "word": "うれしい",
@@ -364,7 +373,8 @@
         "ja": "僕はとてもうれしい。",
         "en": "I'm very happy."
       }
-    ]
+    ],
+    "kanji": "嬉しい"
   },
   {
     "word": "うん",
@@ -444,7 +454,8 @@
         "ja": "すべて君のおかげだ。",
         "en": "I owe it all to you."
       }
-    ]
+    ],
+    "kanji": "お陰"
   },
   {
     "word": "おかしい",
@@ -462,7 +473,8 @@
         "ja": "彼の話はおかしい。",
         "en": "His story sounds strange."
       }
-    ]
+    ],
+    "kanji": "可笑しい"
   },
   {
     "word": "おっしゃる",
@@ -480,7 +492,8 @@
         "ja": "全くおっしゃる通りです。",
         "en": "You are absolutely right."
       }
-    ]
+    ],
+    "kanji": "仰る"
   },
   {
     "word": "おつり",
@@ -499,7 +512,8 @@
         "ja": "おつりが違いますよ。",
         "en": "You gave me the wrong change."
       }
-    ]
+    ],
+    "kanji": "お釣り"
   },
   {
     "word": "おもちゃ",
@@ -517,7 +531,8 @@
         "ja": "僕のおもちゃを直して。",
         "en": "Please fix my toy."
       }
-    ]
+    ],
+    "kanji": "玩具"
   },
   {
     "word": "お金持ち",
@@ -742,7 +757,8 @@
     "meanings": [
       "appearance"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "恰好"
   },
   {
     "word": "かまう",
@@ -750,7 +766,8 @@
     "meanings": [
       "to mind"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "構う"
   },
   {
     "word": "ガラス",
@@ -800,7 +817,8 @@
         "ja": "最寄駅で降ろしてくださる？",
         "en": "Would you kindly let me off at the nearest station?"
       }
-    ]
+    ],
+    "kanji": "下さる"
   },
   {
     "word": "くれる",
@@ -844,7 +862,8 @@
     "meanings": [
       "to injure"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "怪我する"
   },
   {
     "word": "けれど/けれども",
@@ -870,7 +889,8 @@
         "ja": "彼らは会えば必ずけんかする。",
         "en": "Whenever they meet, they quarrel."
       }
-    ]
+    ],
+    "kanji": "喧嘩する"
   },
   {
     "word": "こう",
@@ -906,7 +926,8 @@
         "ja": "ごちそうさまでした。",
         "en": "Thank you for the lovely dinner."
       }
-    ]
+    ],
+    "kanji": "御馳走"
   },
   {
     "word": "こと",
@@ -934,7 +955,8 @@
       "the other day",
       "recently"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "この間"
   },
   {
     "word": "このごろ",
@@ -953,7 +975,8 @@
         "ja": "彼はこのごろ影を潜めてる。",
         "en": "He is out of circulation these days."
       }
-    ]
+    ],
+    "kanji": "この頃"
   },
   {
     "word": "ごみ",
@@ -979,7 +1002,8 @@
     "meanings": [
       "(respectful) to see"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "ご覧になる"
   },
   {
     "word": "これから",
@@ -1138,7 +1162,8 @@
     "meanings": [
       "a particular"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "叱る"
   },
   {
     "word": "しっかり",
@@ -1194,7 +1219,8 @@
         "ja": "じゃましないで。",
         "en": "Stop bugging me!"
       }
-    ]
+    ],
+    "kanji": "邪魔"
   },
   {
     "word": "ジャム",
@@ -1284,7 +1310,8 @@
         "ja": "波に足をすくわれた。",
         "en": "The waves carried me off my feet."
       }
-    ]
+    ],
+    "kanji": "空く"
   },
   {
     "word": "スクリーン",
@@ -1383,7 +1410,8 @@
         "ja": "すばらしい日ですね。",
         "en": "It's a nice day, isn't it?"
       }
-    ]
+    ],
+    "kanji": "素晴らしい"
   },
   {
     "word": "すり",
@@ -1855,7 +1883,8 @@
     "meanings": [
       "barber"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "床屋"
   },
   {
     "word": "どんどん",
@@ -1945,7 +1974,8 @@
         "ja": "家においでよ。",
         "en": "Come over!"
       }
-    ]
+    ],
+    "kanji": "匂い"
   },
   {
     "word": "ぬれる",
@@ -1959,7 +1989,8 @@
         "ja": "足がぬれると、風邪をひくよ。",
         "en": "If your feet get wet, you'll get a cold."
       }
-    ]
+    ],
+    "kanji": "濡れる"
   },
   {
     "word": "ねだん",
@@ -1967,7 +1998,8 @@
     "meanings": [
       "price"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "値段"
   },
   {
     "word": "ねっしん",
@@ -1975,7 +2007,8 @@
     "meanings": [
       "enthusiasm"
     ],
-    "level": "N4"
+    "level": "N4",
+    "kanji": "熱心"
   },
   {
     "word": "のど",
@@ -1993,7 +2026,8 @@
         "ja": "のどが痛いです。",
         "en": "I have a sore throat."
       }
-    ]
+    ],
+    "kanji": "喉"
   },
   {
     "word": "パート",
@@ -2119,7 +2153,8 @@
         "ja": "ひげがなくなった！",
         "en": "The beard's gone!"
       }
-    ]
+    ],
+    "kanji": "髭"
   },
   {
     "word": "びっくりする",
@@ -2155,7 +2190,8 @@
         "ja": "ひどい天気だ。",
         "en": "The weather's terrible."
       }
-    ]
+    ],
+    "kanji": "酷い"
   },
   {
     "word": "ビル",
@@ -2209,7 +2245,8 @@
         "ja": "ぶどう酒を一瓶ください。",
         "en": "Give me a bottle of wine."
       }
-    ]
+    ],
+    "kanji": "葡萄"
   },
   {
     "word": "プレゼント",
@@ -2299,7 +2336,8 @@
         "ja": "みんないつもトニーをほめる。",
         "en": "Everyone always speaks well of Tony."
       }
-    ]
+    ],
+    "kanji": "褒める"
   },
   {
     "word": "まじめ",
@@ -2317,7 +2355,8 @@
         "ja": "まじめに受け取るな。",
         "en": "Don't take it seriously."
       }
-    ]
+    ],
+    "kanji": "真面目"
   },
   {
     "word": "まず",
@@ -2434,7 +2473,8 @@
         "ja": "調べてもらう必要がある。",
         "en": "It wants looking into."
       }
-    ]
+    ],
+    "kanji": "貰う"
   },
   {
     "word": "やっと",

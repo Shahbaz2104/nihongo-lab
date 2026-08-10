@@ -67,7 +67,8 @@
         "ja": "結婚が聞いてあきれる！",
         "en": "You call that a marriage?"
       }
-    ]
+    ],
+    "kanji": "呆れる"
   },
   {
     "word": "アクセント",
@@ -103,7 +104,8 @@
         "ja": "大あくびをして。",
         "en": "Yawn a big long yawn."
       }
-    ]
+    ],
+    "kanji": "欠伸"
   },
   {
     "word": "あげる (=やる)",
@@ -638,7 +640,8 @@
       "your wife",
       "madam"
     ],
-    "level": "N2"
+    "level": "N2",
+    "kanji": "奥さん"
   },
   {
     "word": "おさきに",
@@ -999,7 +1002,8 @@
       "to gnaw",
       "to nibble"
     ],
-    "level": "N2"
+    "level": "N2",
+    "kanji": "齧る"
   },
   {
     "word": "カセット",
@@ -1072,7 +1076,8 @@
         "ja": "背中がかゆい。",
         "en": "My back is itchy."
       }
-    ]
+    ],
+    "kanji": "痒い"
   },
   {
     "word": "カラー",
@@ -1575,7 +1580,8 @@
         "ja": "彼女の悲しみは無言でこぼす涙になって表れた。",
         "en": "Her sorrow found expression in silent tears."
       }
-    ]
+    ],
+    "kanji": "零す"
   },
   {
     "word": "こぼれる",
@@ -1584,7 +1590,8 @@
       "to overflow",
       "to spill"
     ],
-    "level": "N2"
+    "level": "N2",
+    "kanji": "零れる"
   },
   {
     "word": "ゴム",
@@ -1943,7 +1950,8 @@
         "ja": "あの犬はしっぽが短い。",
         "en": "That dog has a short tail."
       }
-    ]
+    ],
+    "kanji": "尻尾"
   },
   {
     "word": "しびれる",
@@ -1963,7 +1971,8 @@
         "ja": "その電線に触るとしびれるよ。",
         "en": "If you touch that wire, you will receive a shock."
       }
-    ]
+    ],
+    "kanji": "痺れる"
   },
   {
     "word": "しぼむ",
@@ -1980,7 +1989,8 @@
         "ja": "花は切られるとすぐにしぼむ。",
         "en": "Flowers soon fade when they have been cut."
       }
-    ]
+    ],
+    "kanji": "萎む"
   },
   {
     "word": "しみじみ",
@@ -2802,7 +2812,8 @@
     "meanings": [
       "chest of drawers"
     ],
-    "level": "N2"
+    "level": "N2",
+    "kanji": "箪笥"
   },
   {
     "word": "ちぎる",
@@ -2884,7 +2895,8 @@
         "ja": "足元に気をつけなさい。さもないと手荷物につまずくよ。",
         "en": "Watch your step, or else you will trip on the baggage."
       }
-    ]
+    ],
+    "kanji": "躓く"
   },
   {
     "word": "テーマ",
@@ -3226,7 +3238,8 @@
         "ja": "彼は手紙をポケットにねじ込んだ。",
         "en": "He shoved the letter into his pocket."
       }
-    ]
+    ],
+    "kanji": "螺子"
   },
   {
     "word": "ネックレス",
@@ -3933,7 +3946,8 @@
         "ja": "創造論者の中には、アダムとイブにへそはなくエデンの園の木には年輪がなかったと信じる人もいる。",
         "en": "Some creationists believe that Adam and Eve had no navels, and that the trees in the Garden of Eden had no growth rings."
       }
-    ]
+    ],
+    "kanji": "臍"
   },
   {
     "word": "ベテラン",
@@ -4179,7 +4193,8 @@
         "ja": "クエーサーとは、非常に遠方にある、まぶしい輝きを放つ天体だ。",
         "en": "Quasars are brilliantly shining heavenly bodies that are extremely far away."
       }
-    ]
+    ],
+    "kanji": "眩しい"
   },
   {
     "word": "まぶた",
@@ -4197,7 +4212,8 @@
         "ja": "左のまぶたがぴくぴくする。",
         "en": "The left eyelid is twitching."
       }
-    ]
+    ],
+    "kanji": "瞼"
   },
   {
     "word": "マフラー",
@@ -4670,7 +4686,8 @@
         "ja": "卵を半熟にゆでるのって、どれくらい時間がかかる？",
         "en": "How long does it take to soft boil an egg?"
       }
-    ]
+    ],
+    "kanji": "茹でる"
   },
   {
     "word": "よこす",
@@ -4938,7 +4955,8 @@
     "meanings": [
       "comparatively"
     ],
-    "level": "N2"
+    "level": "N2",
+    "kanji": "割合に"
   },
   {
     "word": "ワンピース",

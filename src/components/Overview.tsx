@@ -31,25 +31,26 @@ export function Overview() {
       </header>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <StatCard label="Due today" value={stats ? String(stats.dueCards) : "…"} accent="text-accent" />
-        <StatCard label="Total cards" value={stats ? String(stats.totalCards) : "…"} />
-        <StatCard label="Reviewed today" value={stats ? String(stats.todayReviews) : "…"} />
+        <StatCard label="Due today" value={stats ? String(stats.dueCards) : "…"} accent="text-accent" bar="bg-accent" />
+        <StatCard label="Total cards" value={stats ? String(stats.totalCards) : "…"} bar="bg-indigo" />
+        <StatCard label="Reviewed today" value={stats ? String(stats.todayReviews) : "…"} bar="bg-gold" />
         <StatCard
           label="Accuracy"
           value={stats?.todayAccuracy == null ? "–" : `${stats.todayAccuracy}%`}
+          bar="bg-good"
         />
       </div>
 
       {stats && stats.dueCards > 0 && (
         <Link
           href="/review"
-          className="flex items-center justify-between rounded-2xl bg-accent px-6 py-5 text-black transition-opacity hover:opacity-90"
+          className="group flex items-center justify-between rounded-2xl bg-gradient-to-r from-accent via-[#ff4a5a] to-gold px-6 py-5 text-black shadow-lg shadow-accent/25 transition-transform hover:scale-[1.01]"
         >
           <div>
             <div className="text-lg font-bold">{stats.dueCards} cards ready to review</div>
             <div className="text-sm opacity-80">Keep your streak alive →</div>
           </div>
-          <div className="font-jp text-3xl">復習</div>
+          <div className="font-jp text-3xl transition-transform group-hover:-rotate-6">復習</div>
         </Link>
       )}
 
@@ -72,10 +73,11 @@ export function Overview() {
   );
 }
 
-function StatCard({ label, value, accent }: { label: string; value: string; accent?: string }) {
+function StatCard({ label, value, accent, bar }: { label: string; value: string; accent?: string; bar?: string }) {
   return (
-    <div className="rounded-2xl border border-line bg-panel p-4">
-      <div className={`text-2xl font-bold ${accent ?? ""}`}>{value}</div>
+    <div className="relative overflow-hidden rounded-2xl border border-line bg-panel p-4">
+      <div className={`absolute inset-x-0 top-0 h-0.5 ${bar ?? "bg-line"}`} />
+      <div className={`text-2xl font-bold tabular-nums ${accent ?? ""}`}>{value}</div>
       <div className="mt-1 text-xs text-muted">{label}</div>
     </div>
   );

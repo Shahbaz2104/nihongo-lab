@@ -2,10 +2,16 @@
 
 import { useMemo, useState } from "react";
 import type { VocabItem } from "@/lib/datasets";
+import type { AnnotatedExample } from "@/lib/annotate";
 import { speakJapanese } from "@/lib/tts";
 import { Furigana } from "@/components/Furigana";
+import { RubyText } from "@/components/RubyText";
 
-export function VocabBrowser({ levels }: { levels: Record<string, VocabItem[]> }) {
+interface Row extends Omit<VocabItem, "examples"> {
+  examples: AnnotatedExample[];
+}
+
+export function VocabBrowser({ levels }: { levels: Record<string, Row[]> }) {
   const [level, setLevel] = useState("N5");
   const [query, setQuery] = useState("");
 
@@ -16,6 +22,7 @@ export function VocabBrowser({ levels }: { levels: Record<string, VocabItem[]> }
     return items.filter(
       (v) =>
         v.word.includes(q) ||
+        v.kanji?.includes(q) ||
         v.reading.includes(q) ||
         v.meanings.some((m) => m.toLowerCase().includes(q)),
     );
@@ -47,24 +54,48 @@ export function VocabBrowser({ levels }: { levels: Record<string, VocabItem[]> }
       </div>
 
       <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-panel">
-        {filtered.slice(0, 300).map((v) => (
-          <div key={v.word} className="flex items-center gap-4 px-4 py-3">
-            <button
-              onClick={() => speakJapanese(v.word)}
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-line text-xs text-muted transition-colors hover:border-accent hover:text-accent"
-              aria-label={`Speak ${v.word}`}
-            >
-              🔊
-            </button>
-            <div className="w-32 shrink-0">
-              <div className="font-jp text-lg leading-tight">
-                <Furigana word={v.word} reading={v.reading} />
+        {filtered.slice(0, 300).map((v) => {
+          const word = v.kanji ?? v.word;
+          const phrase = v.examples[0];
+          return (
+            <div key={v.word} className="px-4 py-3">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => speakJapanese(v.reading || word)}
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-line text-xs text-muted transition-colors hover:border-accent hover:text-accent"
+                  aria-label={`Speak ${word}`}
+                >
+                  🔊
+                </button>
+                <div className="w-40 shrink-0">
+                  <div className="font-jp text-lg leading-tight">
+                    <Furigana word={word} reading={v.reading} />
+                  </div>
+                  <div className="text-xs text-muted">{v.reading}</div>
+                </div>
+                <div className="min-w-0 flex-1 text-sm">{v.meanings.join("; ")}</div>
               </div>
-              <div className="text-xs text-muted">{v.reading}</div>
+              {phrase && (
+                <div className="ml-12 mt-2 flex items-start gap-2 rounded-xl bg-panel-2 px-3 py-2">
+                  <button
+                    onClick={() => speakJapanese(phrase.ja)}
+                    className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded border border-line text-[10px] text-muted transition-colors hover:border-accent hover:text-accent"
+                    aria-label={`Speak phrase`}
+                  >
+                    🔊
+                  </button>
+                  <div className="min-w-0">
+                    <div className="font-jp text-sm">
+                      <RubyText tokens={phrase.tokens} />
+                    </div>
+                    <div className="mt-0.5 text-[11px] text-muted italic">{phrase.romaji}</div>
+                    <div className="mt-0.5 text-xs text-muted">{phrase.en}</div>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="min-w-0 flex-1 text-sm">{v.meanings.join("; ")}</div>
-          </div>
-        ))}
+          );
+        })}
         {filtered.length === 0 && <div className="px-4 py-8 text-center text-sm text-muted">No matches.</div>}
       </div>
     </div>
