@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { CheckCircle, Trophy, XCircle } from "@phosphor-icons/react";
 import type { Token } from "@/lib/tokenizer";
 import { HoverText } from "@/components/HoverText";
-import { speakJapanese } from "@/lib/tts";
+import { SpeakButton } from "@/components/ui/SpeakButton";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Button } from "@/components/ui/Button";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 export interface StorySentence {
   jp: string;
@@ -48,27 +52,32 @@ interface Props {
   conversations: Conversation[];
 }
 
-function SpeakButton({ text, size = "md" }: { text: string; size?: "sm" | "md" }) {
-  const [playing, setPlaying] = useState(false);
-  return (
-    <button
-      onClick={() => {
-        if (playing) return;
-        setPlaying(true);
-        speakJapanese(text).finally(() => setPlaying(false));
-      }}
-      className={`grid shrink-0 place-items-center rounded-lg border border-line text-muted transition-colors hover:border-accent hover:text-accent ${
-        size === "sm" ? "h-7 w-7 text-xs" : "h-9 w-9 text-sm"
-      }`}
-      aria-label="Speak"
-    >
-      {playing ? "…" : "🔊"}
-    </button>
-  );
+function useActiveSentence(count: number) {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (count === 0) return;
+    const els = Array.from(document.querySelectorAll<HTMLElement>("[data-sentence]"));
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setActive(Number((e.target as HTMLElement).dataset.sentence));
+          }
+        }
+      },
+      { rootMargin: "-25% 0px -65% 0px" },
+    );
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [count]);
+
+  return active;
 }
 
 function StoryView({ story }: { story: Story }) {
   const [showEn, setShowEn] = useState(false);
+  const active = useActiveSentence(story.sentences.length);
 
   return (
     <div className="space-y-5">
@@ -82,25 +91,41 @@ function StoryView({ story }: { story: Story }) {
           </div>
           <p className="mt-1 text-sm text-muted">{story.titleEn}</p>
         </div>
-        <label className="flex cursor-pointer items-center gap-2 text-xs text-muted">
-          <input
-            type="checkbox"
-            checked={showEn}
-            onChange={(e) => setShowEn(e.target.checked)}
-            className="accent-[--color-accent]"
+        <div className="flex items-center gap-3">
+          <label className="flex cursor-pointer items-center gap-2 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={showEn}
+              onChange={(e) => setShowEn(e.target.checked)}
+              className="accent-[--color-accent]"
+            />
+            Show English
+          </label>
+          <SpeakButton
+            text={story.sentences.map((s) => s.jp)}
+            label="Listen to whole story"
           />
-          Show English
-        </label>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <ProgressBar value={(active + 1) / story.sentences.length} className="flex-1" />
+        <span className="text-xs tabular-nums text-muted">
+          sentence {active + 1} / {story.sentences.length}
+        </span>
       </div>
 
       <div className="space-y-4">
         {story.sentences.map((s, i) => (
           <motion.div
             key={i}
+            data-sentence={i}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
-            className="rounded-2xl border border-line bg-panel p-4 transition-colors hover:border-accent/40"
+            className={`rounded-2xl border p-4 transition-colors ${
+              i === active ? "border-accent/50 bg-panel" : "border-line bg-panel/60 hover:border-accent/40"
+            }`}
           >
             <div className="flex items-start gap-3">
               <span className="mt-1 w-6 shrink-0 text-right text-xs tabular-nums text-muted">
@@ -110,7 +135,7 @@ function StoryView({ story }: { story: Story }) {
                 tokens={s.tokens}
                 className="flex-1 font-jp text-xl leading-relaxed tracking-wide"
               />
-              <SpeakButton text={s.jp} />
+              <SpeakButton text={s.jp} size="sm" label={`Listen to sentence ${i + 1}`} />
             </div>
             {showEn && (
               <motion.p
@@ -126,7 +151,7 @@ function StoryView({ story }: { story: Story }) {
       </div>
 
       <p className="text-xs text-muted/70">
-        Tip: hover any word to see its reading, romaji, and meaning.
+        Tip: hover or tap any word to see its reading, romaji, and meaning.
       </p>
     </div>
   );
@@ -136,6 +161,7 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
   const [ptr, setPtr] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
+  const reduce = useReducedMotion();
 
   const done = ptr >= conversation.turns.length;
   const current = done ? null : conversation.turns[ptr];
@@ -159,19 +185,21 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
   };
 
   if (done) {
+    const total = conversation.turns.filter((t) => t.options.length > 0).length;
+    const pct = total === 0 ? 0 : Math.round((score / total) * 100);
     return (
-      <div className="mx-auto max-w-lg rounded-2xl border border-line bg-panel py-14 text-center">
-        <div className="mb-3 font-jp text-5xl">おつかれさまでした 🎉</div>
-        <p className="text-muted">
-          You answered {score} of {conversation.turns.filter((t) => t.options.length > 0).length}{" "}
-          choices correctly.
+      <div className="mx-auto max-w-lg rounded-2xl border border-line bg-panel px-6 py-14 text-center">
+        <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-accent-soft">
+          <Trophy size={30} weight="duotone" className="text-accent" />
+        </div>
+        <div className="font-jp text-4xl font-bold">おつかれさま</div>
+        <div className="mt-4 text-3xl font-bold tabular-nums">{pct}%</div>
+        <p className="mt-2 text-sm text-muted">
+          You answered {score} of {total} choices correctly.
         </p>
-        <button
-          onClick={restart}
-          className="mt-8 rounded-xl bg-accent px-6 py-3 font-medium text-black transition-opacity hover:opacity-90"
-        >
+        <Button className="mt-8" onClick={restart}>
           Try again
-        </button>
+        </Button>
       </div>
     );
   }
@@ -250,7 +278,7 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
                 key={i}
                 onClick={() => choose(i)}
                 disabled={selected !== null}
-                className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${style}`}
+                className={`press flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors disabled:cursor-default ${style}`}
               >
                 <span className="text-xs text-muted">{i + 1}.</span>
                 <HoverText tokens={opt.tokens} className="font-jp text-base" />
@@ -262,30 +290,33 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
           <AnimatePresence>
             {selected !== null && (
               <motion.div
-                initial={{ opacity: 0, y: 8 }}
+                initial={reduce ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 className="flex items-center justify-between gap-3 rounded-xl border border-line bg-panel-2 px-4 py-3"
+                aria-live="polite"
               >
-                <span className="text-sm">
+                <span className="flex items-center gap-2 text-sm">
                   {current.options[selected].correct ? (
-                    <span className="text-good">Correct!</span>
+                    <>
+                      <CheckCircle size={16} weight="bold" className="shrink-0 text-good" />
+                      <span className="text-good">Correct!</span>
+                    </>
                   ) : (
-                    <span className="text-red-400">
-                      Not quite — the natural reply is «{" "}
-                      <span className="font-jp text-foreground">
-                        {current.options.find((o) => o.correct)?.jp}
-                      </span>{" "}
-                      »
-                    </span>
+                    <>
+                      <XCircle size={16} weight="bold" className="shrink-0 text-red-400" />
+                      <span className="text-red-400">
+                        Not quite — the natural reply is{" "}
+                        <span className="font-jp text-foreground">
+                          {current.options.find((o) => o.correct)?.jp}
+                        </span>
+                      </span>
+                    </>
                   )}
                 </span>
-                <button
-                  onClick={next}
-                  className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-black transition-opacity hover:opacity-90"
-                >
-                  Continue →
-                </button>
+                <Button size="sm" onClick={next}>
+                  Continue
+                </Button>
               </motion.div>
             )}
           </AnimatePresence>
@@ -293,12 +324,9 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
       )}
 
       {current && !isChoice && (
-        <button
-          onClick={next}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-black transition-opacity hover:opacity-90"
-        >
-          Continue →
-        </button>
+        <Button size="sm" onClick={next}>
+          Continue
+        </Button>
       )}
     </div>
   );
@@ -311,24 +339,14 @@ export function StoryReader({ stories, conversations }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-1 rounded-xl border border-line bg-panel p-1">
-        {(
-          [
-            ["reading", "Reading"],
-            ["conversation", "Conversation"],
-          ] as const
-        ).map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => setTab(key)}
-            className={`flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
-              tab === key ? "bg-accent text-black" : "text-muted hover:text-foreground"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <SegmentedControl
+        options={[
+          { id: "reading", label: "Reading" },
+          { id: "conversation", label: "Conversation" },
+        ]}
+        value={tab}
+        onChange={(id) => setTab(id as "reading" | "conversation")}
+      />
 
       {tab === "reading" && (
         <div className="space-y-6">
@@ -337,7 +355,7 @@ export function StoryReader({ stories, conversations }: Props) {
               <button
                 key={s.id}
                 onClick={() => setStoryIdx(i)}
-                className={`rounded-xl border px-4 py-2 text-left transition-colors ${
+                className={`press rounded-xl border px-4 py-2 text-left transition-colors ${
                   storyIdx === i
                     ? "border-accent bg-accent-soft text-foreground"
                     : "border-line bg-panel text-muted hover:border-accent/50 hover:text-foreground"
@@ -361,7 +379,7 @@ export function StoryReader({ stories, conversations }: Props) {
               <button
                 key={c.id}
                 onClick={() => setConvIdx(i)}
-                className={`rounded-xl border px-4 py-2 text-left transition-colors ${
+                className={`press rounded-xl border px-4 py-2 text-left transition-colors ${
                   convIdx === i
                     ? "border-accent bg-accent-soft text-foreground"
                     : "border-line bg-panel text-muted hover:border-accent/50 hover:text-foreground"

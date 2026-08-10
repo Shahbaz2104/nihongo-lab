@@ -20,7 +20,7 @@ morphology-light tokenizer, a kana→romaji converter, and a fully unit-tested S
   dialogue. Pick your line from three natural options, get instant correct/incorrect feedback,
   and build a scored transcript you can replay with TTS audio.
 - Every story line and conversation turn has **native Japanese TTS** (browser Web Speech API,
-  no API key).
+  no API key); transcripts can be replayed as a reliable line-by-line sequence.
 
 ### 🗂 Review — SM-2 spaced repetition
 - Flashcards for **vocab / kanji / kana / grammar** at any JLPT level.
@@ -79,10 +79,11 @@ long vowels (`ー`), gemination (`っ`), and yō-on (`きゃ → kya`, `しゃ �
 | Framework | Next.js 16 (App Router, Turbopack) · React 19 · TypeScript |
 | Styling | Tailwind CSS v4 (CSS-first config) |
 | Motion | Framer Motion |
+| Icons | Phosphor Icons (`@phosphor-icons/react`) |
 | DB / ORM | Prisma 7 + SQLite via `@prisma/adapter-better-sqlite3` |
 | Charts | Recharts |
 | Tests | Vitest |
-| TTS | Web Speech API (`speechSynthesis`, Japanese voice) |
+| TTS | Web Speech API (`speechSynthesis`, Japanese voice, sequenced line playback) |
 | Data | Bundled JSON from OpenJLPT / KanjiVG (see Licensing) |
 
 ---
@@ -111,6 +112,7 @@ src/
       stats                  GET  — dashboard aggregate + history
     review/ kana/ kanji/ vocab/ grammar/ quiz/ stats/ stories/   UI pages
   components/                Client components (FlashcardReview, KanjiDraw, StoryReader, …)
+  components/ui/             Shared UI primitives (Button, Modal, SegmentedControl, SpeakButton, …)
 ```
 
 ---

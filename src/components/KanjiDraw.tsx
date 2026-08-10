@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Eraser } from "@phosphor-icons/react";
 
 interface Props {
   character: string;
@@ -31,7 +32,7 @@ export function KanjiDraw({ character, size = 200 }: Props) {
     const ctx = canvasRef.current!.getContext("2d")!;
     const p = pos(e);
     ctx.lineTo(p.x, p.y);
-    ctx.strokeStyle = "#e6e9ef";
+    ctx.strokeStyle = "#e8ecf3";
     ctx.lineWidth = 6;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -58,11 +59,13 @@ export function KanjiDraw({ character, size = 200 }: Props) {
           onPointerMove={move}
           onPointerUp={stop}
           onPointerLeave={stop}
+          role="img"
+          aria-label={`Practice drawing ${character}`}
           className="cursor-crosshair touch-none rounded-xl border border-line bg-panel-2"
         />
         <div
           className="pointer-events-none absolute inset-0 grid place-items-center font-jp text-6xl"
-          style={{ opacity, color: "#e6e9ef" }}
+          style={{ opacity, color: "#e8ecf3" }}
           aria-hidden
         >
           {character}
@@ -77,14 +80,16 @@ export function KanjiDraw({ character, size = 200 }: Props) {
             step={0.05}
             value={opacity}
             onChange={(e) => setOpacity(Number(e.target.value))}
-            className="accent-[#ff5c5c]"
+            aria-label="Guide opacity"
+            className="accent-[--color-accent]"
           />
           guide
         </label>
         <button
           onClick={clear}
-          className="rounded-lg border border-line px-4 py-1.5 text-xs font-semibold text-muted transition-colors hover:text-foreground"
+          className="press flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-muted transition-colors hover:text-foreground"
         >
+          <Eraser size={13} />
           Clear
         </button>
       </div>

@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { CheckCircle, Trophy, XCircle } from "@phosphor-icons/react";
 import { api, type QuizQuestion } from "@/lib/api";
 import { speakJapanese } from "@/lib/tts";
 import { LevelSelector } from "@/components/LevelSelector";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { Button } from "@/components/ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 const types = [
   { id: "vocab", label: "Vocab", speak: true },
@@ -22,6 +27,7 @@ export function Quiz() {
   const [loading, setLoading] = useState(true);
   const [done, setDone] = useState(false);
   const [round, setRound] = useState(0);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     let alive = true;
@@ -80,54 +86,72 @@ export function Quiz() {
     startNew();
   };
 
+  useEffect(() => {
+    if (loading || done || picked) return;
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName)) return;
+      if (["1", "2", "3", "4"].includes(e.key)) {
+        const opt = q.options[Number(e.key) - 1];
+        if (opt) {
+          e.preventDefault();
+          pick(opt);
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Quiz</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Quiz</h1>
           <p className="mt-1 text-sm text-muted">Multiple-choice on your current level.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex gap-1 rounded-xl border border-line bg-panel p-1">
-            {types.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => changeType(t.id)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  type === t.id ? "bg-accent text-black" : "text-muted hover:text-foreground"
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl
+            options={types}
+            value={type}
+            onChange={changeType}
+          />
           <LevelSelector value={level} onChange={changeLevel} />
-          <button
-            onClick={startNew}
-            className="rounded-xl border border-line bg-panel px-4 py-1.5 text-xs font-semibold text-muted transition-colors hover:text-foreground"
-          >
+          <Button variant="secondary" size="sm" onClick={startNew}>
             New quiz
-          </button>
+          </Button>
         </div>
       </header>
 
-      {loading && <div className="py-20 text-center text-muted">Loading…</div>}
+      {loading && (
+        <div className="mx-auto max-w-lg space-y-4">
+          <div className="flex items-center justify-between text-xs text-muted">
+            <span className="uppercase tracking-widest">
+              {type} · {level}
+            </span>
+            <Skeleton className="h-3 w-12" />
+          </div>
+          <Skeleton className="h-72 w-full" />
+        </div>
+      )}
 
       {!loading && done && (
-        <div className="mx-auto max-w-md py-16 text-center">
-          <div className="mb-4 font-jp text-5xl">結果</div>
-          <div className="text-2xl font-bold">
+        <div className="mx-auto max-w-md rounded-2xl border border-line bg-panel px-6 py-14 text-center">
+          <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-accent-soft">
+            <Trophy size={30} weight="duotone" className="text-accent" />
+          </div>
+          <div className="font-jp text-4xl font-bold">結果</div>
+          <div className="mt-4 text-3xl font-bold tabular-nums">
             {score} / {questions.length}
           </div>
           <p className="mt-2 text-muted">
-            {score === questions.length ? "Perfect! 完璧！" : "Keep practicing — 頑張って！"}
+            {score === questions.length
+              ? "Perfect — 完璧！"
+              : "Keep practicing — 頑張って！"}
           </p>
-          <button
-            onClick={startNew}
-            className="mt-8 rounded-xl bg-accent px-6 py-3 font-medium text-black transition-opacity hover:opacity-90"
-          >
+          <Button className="mt-8" onClick={startNew}>
             Quiz again
-          </button>
+          </Button>
         </div>
       )}
 
@@ -137,28 +161,31 @@ export function Quiz() {
             <span className="uppercase tracking-widest">
               {type} · {level}
             </span>
-            <span>
+            <span className="tabular-nums">
               {index + 1} / {questions.length}
             </span>
           </div>
+          <ProgressBar value={index / questions.length} className="mb-5" />
 
           <motion.div
             key={index}
-            initial={{ opacity: 0, x: 30 }}
+            initial={reduce ? false : { opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             className="rounded-2xl border border-line bg-panel py-10 text-center"
           >
             <button
               onClick={() => speakEnabled && speakJapanese(q.prompt)}
-              className={`font-jp text-5xl font-bold ${speakEnabled ? "transition-transform hover:scale-105" : ""}`}
+              className={`font-jp text-5xl font-bold ${
+                speakEnabled ? "transition-transform hover:scale-105" : ""
+              }`}
             >
               {q.prompt}
             </button>
             {q.alt && <div className="mt-2 text-sm text-muted">{q.alt}</div>}
             <div className="mt-2 text-xs text-muted">What does it mean?</div>
 
-            <div className="mt-8 grid gap-2 px-6">
-              {q.options.map((o) => {
+            <div className="mt-8 grid gap-2 px-6" role="group" aria-label="Answer options">
+              {q.options.map((o, i) => {
                 const isAnswer = o === q.answer;
                 const isPicked = o === picked;
                 let cls = "border-line bg-panel hover:border-accent";
@@ -172,27 +199,44 @@ export function Quiz() {
                     key={o}
                     onClick={() => pick(o)}
                     disabled={!!picked}
-                    className={`rounded-xl border px-4 py-3 text-left text-sm font-medium transition-colors ${cls}`}
+                    className={`press rounded-xl border px-4 py-3 text-left text-sm font-medium transition-colors disabled:cursor-default ${cls}`}
                   >
-                    {o}
+                    <span>{o}</span>
+                    <kbd className="kbd ml-1.5">{i + 1}</kbd>
                   </button>
                 );
               })}
             </div>
 
-            {picked && (
-              <div className="mt-6">
-                <div className={picked === q.answer ? "text-good" : "text-red-400"}>
-                  {picked === q.answer ? "Correct!" : `It was “${q.answer}”`}
-                </div>
-                <button
-                  onClick={next}
-                  className="mt-4 rounded-xl bg-accent px-6 py-2.5 font-medium text-black transition-opacity hover:opacity-90"
-                >
-                  {index + 1 >= questions.length ? "See results" : "Next"}
-                </button>
-              </div>
-            )}
+            <div aria-live="polite">
+              <AnimatePresence>
+                {picked && (
+                  <motion.div
+                    initial={reduce ? false : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="mt-6"
+                  >
+                    <div className="flex items-center justify-center gap-1.5">
+                      {picked === q.answer ? (
+                        <>
+                          <CheckCircle size={16} weight="bold" className="shrink-0 text-good" />
+                          <span className="text-good">Correct!</span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle size={16} weight="bold" className="shrink-0 text-red-400" />
+                          <span className="text-red-400">It was “{q.answer}”</span>
+                        </>
+                      )}
+                    </div>
+                    <Button className="mt-4" onClick={next}>
+                      {index + 1 >= questions.length ? "See results" : "Next"}
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         </div>
       )}

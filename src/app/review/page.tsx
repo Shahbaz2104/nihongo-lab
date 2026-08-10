@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { FlashcardReview } from "@/components/FlashcardReview";
 import { LevelSelector } from "@/components/LevelSelector";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Button } from "@/components/ui/Button";
 
 const types = [
   { id: "vocab", label: "Vocab" },
@@ -19,34 +21,29 @@ export default function ReviewPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold">Review</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Review</h1>
         <p className="mt-1 text-sm text-muted">Spaced-repetition flashcards powered by SM-2.</p>
       </header>
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex gap-1 rounded-xl border border-line bg-panel p-1">
-          {types.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => {
-                setType(t.id);
-                setSession((s) => s + 1);
-              }}
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                type === t.id ? "bg-accent text-black" : "text-muted hover:text-foreground"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-        <LevelSelector value={level} onChange={setLevel} />
-        <button
-          onClick={() => setSession((s) => s + 1)}
-          className="rounded-xl border border-line bg-panel px-4 py-1.5 text-xs font-semibold text-muted transition-colors hover:text-foreground"
-        >
+        <SegmentedControl
+          options={types}
+          value={type}
+          onChange={(id) => {
+            setType(id);
+            setSession((s) => s + 1);
+          }}
+        />
+        <LevelSelector
+          value={level}
+          onChange={(l) => {
+            setLevel(l);
+            setSession((s) => s + 1);
+          }}
+        />
+        <Button variant="secondary" size="sm" onClick={() => setSession((s) => s + 1)}>
           New session
-        </button>
+        </Button>
       </div>
 
       <FlashcardReview

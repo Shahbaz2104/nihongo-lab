@@ -24,22 +24,51 @@ function loadVoices(): Promise<SpeechSynthesisVoice[]> {
   return voicesPromise;
 }
 
-export async function speakJapanese(text: string, rate = 0.85): Promise<void> {
-  if (typeof window === "undefined" || !("speechSynthesis" in window) || !text) return;
+/**
+ * Speak Japanese text. Resolves when playback finishes (or immediately if the
+ * Web Speech API is unavailable). Cancels any currently-playing utterance first.
+ */
+export function speakJapanese(text: string, rate = 0.85): Promise<void> {
+  if (typeof window === "undefined" || !("speechSynthesis" in window) || !text) {
+    return Promise.resolve();
+  }
   const synth = window.speechSynthesis;
 
   synth.cancel();
-  await new Promise((r) => setTimeout(r, 60));
 
-  const voices = await loadVoices();
-  const jpVoice =
-    voices.find((v) => v.lang.startsWith("ja") && v.default) ??
-    voices.find((v) => v.lang === "ja-JP") ??
-    voices.find((v) => v.lang.startsWith("ja"));
+  return new Promise<void>((resolve) => {
+    let settled = false;
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
 
-  const utter = new SpeechSynthesisUtterance(text);
-  if (jpVoice) utter.voice = jpVoice;
-  utter.lang = jpVoice?.lang ?? "ja-JP";
-  utter.rate = rate;
-  synth.speak(utter);
+    loadVoices().then((voices) => {
+      if (settled) return;
+      const jpVoice =
+        voices.find((v) => v.lang.startsWith("ja") && v.default) ??
+        voices.find((v) => v.lang === "ja-JP") ??
+        voices.find((v) => v.lang.startsWith("ja"));
+
+      const utter = new SpeechSynthesisUtterance(text);
+      if (jpVoice) utter.voice = jpVoice;
+      utter.lang = jpVoice?.lang ?? "ja-JP";
+      utter.rate = rate;
+      utter.onend = done;
+      utter.onerror = done;
+      synth.speak(utter);
+    });
+
+    setTimeout(done, 20000);
+  });
+}
+
+/** Speak a sequence of Japanese lines, one after the other. */
+export async function speakJapaneseSequence(texts: string[], rate = 0.85): Promise<void> {
+  for (const text of texts) {
+    if (!text) continue;
+    await speakJapanese(text, rate);
+    await new Promise((r) => setTimeout(r, 250));
+  }
 }
