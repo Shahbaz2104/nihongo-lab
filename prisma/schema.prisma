@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Card {
+  id           String    @id @default(cuid())
+  sourceId     String
+  type         String
+  front        String
+  back         String
+  reading      String?
+  example      String?
+  exampleFuri  String?
+  level        String?
+  status       Int       @default(0)
+  ease         Float     @default(2.5)
+  interval     Int       @default(0)
+  reps         Int       @default(0)
+  lapses       Int       @default(0)
+  due          DateTime  @default(now())
+  lastReviewAt DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@unique([type, sourceId])
+
+  reviewLogs ReviewLog[]
+}
+
+model ReviewLog {
+  id         String   @id @default(cuid())
+  cardId     String
+  card       Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  grade      Int
+  interval   Int
+  ease       Float
+  reviewedAt DateTime @default(now())
+}
+
+model DayStat {
+  id      String   @id @default(cuid())
+  date    String   @unique
+  reviews Int      @default(0)
+  learned Int      @default(0)
+}
