@@ -67,6 +67,30 @@ export function Overview() {
         )}
       </div>
 
+      <Link
+        href="/session"
+        className="press group block rounded-2xl border border-accent/30 bg-gradient-to-br from-panel via-panel to-accent/10 p-6 transition-colors hover:border-accent"
+      >
+        <div className="flex items-center gap-2">
+          <span className="font-jp text-xl font-bold">今日の日本語</span>
+          <span className="rounded-md bg-accent px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-black">
+            Session
+          </span>
+        </div>
+        <div className="mt-1 text-sm text-muted">Today’s Japanese — one guided daily flow.</div>
+        <dl className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-5">
+          <PlanRow label="Reviews" value={stats ? String(stats.dueCards) : "…"} />
+          <PlanRow label="New vocab" value={stats ? String(stats.newWords) : "…"} />
+          <PlanRow label="Quiz" value="5" />
+          <PlanRow label="Reading" value="1" />
+          <PlanRow label="Conversation" value="1" />
+        </dl>
+        <div className="mt-5 flex items-center gap-2 text-sm font-semibold text-accent">
+          Start today2019s session
+          <ArrowRight size={16} weight="bold" className="transition-transform group-hover:translate-x-1" />
+        </div>
+      </Link>
+
       {stats && stats.dueCards > 0 && (
         <Link
           href="/review"
@@ -148,6 +172,15 @@ function StatCard({ label, value, accent, bar }: { label: string; value: string;
       <div className={`absolute inset-x-0 top-0 h-0.5 ${bar ?? "bg-line"}`} />
       <div className={`text-2xl font-bold tabular-nums ${accent ?? ""}`}>{value}</div>
       <div className="mt-1 text-xs text-muted">{label}</div>
+    </div>
+  );
+}
+
+function PlanRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl bg-panel-2/60 px-3 py-2">
+      <dt className="text-[11px] text-muted">{label}</dt>
+      <dd className="text-lg font-bold tabular-nums">{value}</dd>
     </div>
   );
 }

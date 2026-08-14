@@ -51,6 +51,7 @@ export interface Conversation {
 interface Props {
   stories: Story[];
   conversations: Conversation[];
+  initialTab?: "reading" | "conversation";
 }
 
 function useActiveSentence(count: number) {
@@ -514,8 +515,8 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
   );
 }
 
-export function StoryReader({ stories, conversations }: Props) {
-  const [tab, setTab] = useState<"reading" | "conversation">("reading");
+export function StoryReader({ stories, conversations, initialTab = "reading" }: Props) {
+  const [tab, setTab] = useState<"reading" | "conversation">(initialTab);
   const [storyIdx, setStoryIdx] = useState(0);
   const [convIdx, setConvIdx] = useState(0);
 

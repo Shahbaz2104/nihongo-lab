@@ -29,6 +29,16 @@ export interface Stats {
   todayAccuracy: number | null;
   byLevel: { level: string | null; _count: { _all: number } }[];
   history: { date: string; reviews: number; learned: number }[];
+  newWords: number;
+}
+
+export interface NewWord {
+  word: string;
+  kanji: string | null;
+  reading: string;
+  meanings: string[];
+  example: string | null;
+  exampleEn: string | null;
 }
 
 async function j<T>(res: Response): Promise<T> {
@@ -53,6 +63,7 @@ export const api = {
     front: string;
     back: string;
     reading: string | null;
+    level?: string;
   }) =>
     fetch("/api/cards", {
       method: "POST",
@@ -64,4 +75,8 @@ export const api = {
       `/api/quiz?type=${type}&level=${level}&n=${n}${direction ? `&direction=${direction}` : ""}`,
     ).then((r) => j<{ questions: QuizQuestion[] }>(r)),
   stats: () => fetch("/api/stats").then((r) => j<Stats>(r)),
+  sessionNewWords: (level: string, n = 5) =>
+    fetch(`/api/session/newwords?level=${level}&n=${n}`).then((r) =>
+      j<{ words: NewWord[] }>(r),
+    ),
 };

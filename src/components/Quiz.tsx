@@ -37,10 +37,16 @@ const subtitles: Record<string, string> = {
   m: "What does it mean?",
 };
 
-export function Quiz() {
-  const [type, setType] = useState("vocab");
-  const [level, setLevel] = useState("N5");
-  const [direction, setDirection] = useState("je");
+interface QuizProps {
+  initialType?: string;
+  initialLevel?: string;
+  onComplete?: () => void;
+}
+
+export function Quiz({ initialType = "vocab", initialLevel = "N5", onComplete }: QuizProps) {
+  const [type, setType] = useState(initialType);
+  const [level, setLevel] = useState(initialLevel);
+  const [direction, setDirection] = useState(directions[initialType][0].id);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
@@ -188,9 +194,14 @@ export function Quiz() {
               ? "Perfect — 完璧！"
               : "Keep practicing — 頑張って！"}
           </p>
-          <Button className="mt-8" onClick={startNew}>
-            Quiz again
-          </Button>
+          <div className="mt-8 flex items-center justify-center gap-3">
+            {onComplete && (
+              <Button onClick={onComplete}>Continue session</Button>
+            )}
+            <Button variant={onComplete ? "secondary" : "primary"} onClick={startNew}>
+              Quiz again
+            </Button>
+          </div>
         </div>
       )}
 

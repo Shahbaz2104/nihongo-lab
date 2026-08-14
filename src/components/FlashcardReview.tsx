@@ -16,6 +16,7 @@ interface Props {
   level: string;
   limit?: number;
   onRestart?: () => void;
+  onComplete?: () => void;
 }
 
 const gradeOrder: Grade[] = ["again", "hard", "good", "easy"];
@@ -34,7 +35,7 @@ const gradeHints: Record<Grade, string> = {
   easy: "Easy",
 };
 
-export function FlashcardReview({ type, level, limit = 20, onRestart }: Props) {
+export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete }: Props) {
   const [queue, setQueue] = useState<ReviewCard[]>([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -179,9 +180,16 @@ export function FlashcardReview({ type, level, limit = 20, onRestart }: Props) {
         ) : (
           <p className="mt-3 text-muted">No cards available for this level yet.</p>
         )}
-        <Button className="mt-8" onClick={onRestart}>
-          Review again
-        </Button>
+        <div className="mt-8 flex items-center justify-center gap-3">
+          {onComplete && (
+            <Button onClick={onComplete}>
+              {queue.length === 0 ? "Continue" : "Continue session"}
+            </Button>
+          )}
+          <Button variant={onComplete ? "secondary" : "primary"} onClick={onRestart}>
+            Review again
+          </Button>
+        </div>
       </div>
     );
   }
