@@ -52,12 +52,14 @@ export function Quiz({ initialType = "vocab", initialLevel = "N5", onComplete }:
   const [picked, setPicked] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
   const [done, setDone] = useState(false);
   const [round, setRound] = useState(0);
   const reduce = useReducedMotion();
 
   useEffect(() => {
     let alive = true;
+    setFailed(false);
     api
       .quiz(type, level, 10, direction)
       .then(({ questions }) => {
@@ -67,7 +69,10 @@ export function Quiz({ initialType = "vocab", initialLevel = "N5", onComplete }:
         }
       })
       .catch(() => {
-        if (alive) setLoading(false);
+        if (alive) {
+          setFailed(true);
+          setLoading(false);
+        }
       });
     return () => {
       alive = false;
@@ -177,6 +182,16 @@ export function Quiz({ initialType = "vocab", initialLevel = "N5", onComplete }:
             <Skeleton className="h-3 w-12" />
           </div>
           <Skeleton className="h-72 w-full" />
+        </div>
+      )}
+
+      {!loading && failed && (
+        <div className="mx-auto max-w-md rounded-2xl border border-line bg-panel px-6 py-14 text-center">
+          <div className="font-jp text-3xl font-bold">エラー</div>
+          <p className="mt-3 text-muted">Unable to load the quiz. Please try again.</p>
+          <Button className="mt-8" onClick={startNew}>
+            Try again
+          </Button>
         </div>
       )}
 

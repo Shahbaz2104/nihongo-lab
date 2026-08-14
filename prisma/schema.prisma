@@ -27,6 +27,9 @@ model Card {
   createdAt    DateTime  @default(now())
 
   @@unique([type, sourceId])
+  @@index([due])
+  @@index([level])
+  @@index([type])
 
   reviewLogs ReviewLog[]
 }
@@ -39,6 +42,9 @@ model ReviewLog {
   interval   Int
   ease       Float
   reviewedAt DateTime @default(now())
+
+  @@index([reviewedAt])
+  @@index([cardId])
 }
 
 model DayStat {

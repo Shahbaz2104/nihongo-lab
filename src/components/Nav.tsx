@@ -9,6 +9,7 @@ import {
   ChartBar,
   Ear,
   House,
+  Info,
   ListDashes,
   PencilSimpleLine,
   TextAa,
@@ -78,6 +79,16 @@ export function Nav() {
           honestly keeps SM-2 intervals accurate.
         </p>
       </div>
+
+      <Link
+        href="/about"
+        className={`mt-2 flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors lg:mt-4 ${
+          pathname === "/about" ? "bg-accent-soft text-accent" : "text-muted hover:bg-panel hover:text-foreground"
+        }`}
+      >
+        <Info size={16} weight="duotone" className="opacity-70" />
+        <span className="font-medium">About &amp; data</span>
+      </Link>
     </aside>
   );
 }
