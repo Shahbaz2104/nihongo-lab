@@ -40,6 +40,10 @@ export interface Stats {
   byLevel: { level: string | null; _count: { _all: number } }[];
   history: { date: string; reviews: number; learned: number }[];
   newWords: number;
+  totalReviews: number;
+  cardsLearned: number;
+  learnedByType: { vocab: number; kanji: number; kana: number; grammar: number };
+  levelProgress: { level: string; learned: number; total: number; pct: number }[];
 }
 
 export interface NewWord {
