@@ -45,10 +45,30 @@ morphology-light tokenizer, a kana→romaji converter, and a fully unit-tested S
 - JLPT grammar points with meaning, formation rules, and example sentences.
 
 ### 🎯 Quiz
-- Server-generated multiple-choice quizzes with distractor options.
+- Server-generated multiple-choice quizzes with meaningful distractor options
+  (deduplicated, exactly one correct answer) — seeded generation is
+  reproducible via `?seed=`.
+- Balanced question directions: vocab J→E / E→J, kanji → meaning / → reading.
+
+### 🎧 Listening
+- A TTS listening quiz: hear a sentence and pick the one you heard, with
+  replay, slow playback, and per-round scoring.
+- Distractors are ranked by shared vocabulary with the target sentence, so
+  options differ in content while matching the same grammar shape.
+
+### 📅 Daily session
+- "今日の日本語" — one guided daily flow: review → new vocabulary →
+  reading → quiz → conversation → daily result, at your chosen JLPT level.
 
 ### 📊 Stats
-- Review history, today's accuracy, per-level card counts, and a learning-over-time chart.
+- Today's reviews/accuracy/streak, cards due and learned (words, kanji,
+  grammar), total reviews, stories completed — all real data.
+- Learning-over-time chart from daily history, and **progress by JLPT
+  level** computed against the actual curriculum size.
+
+### 🏷 About & data
+- Dedicated attribution page (`/about`): sources, licenses, bundle update
+  dates for OpenJLPT/JMdict/KANJIDIC2/Tatoeba/KanjiVG.
 
 ---
 
@@ -109,11 +129,18 @@ src/
       review/queue           GET  — due + new review queue for a type/level
       review                 POST — grade a card (SM-2 update + stats)
       quiz                   GET  — multiple-choice questions with distractors
+      listening              GET  — listening quiz (sentences + options + tokens)
+      cards                  POST — ensure a card exists (add-to-review)
+      session/newwords       GET  — unseen vocab words for the daily session
       stats                  GET  — dashboard aggregate + history
-    review/ kana/ kanji/ vocab/ grammar/ quiz/ stats/ stories/   UI pages
-  components/                Client components (FlashcardReview, KanjiDraw, StoryReader, …)
+    review/ kana/ kanji/ vocab/ grammar/ quiz/ listening/ session/ stats/ stories/ about/   UI pages
+  components/                Client components (FlashcardReview, KanjiDraw, StoryReader, Session, …)
   components/ui/             Shared UI primitives (Button, Modal, SegmentedControl, SpeakButton, …)
+  lib/random.ts              Seeded PRNG for deterministic generation
+  lib/dates.ts               Local-timezone day keys + streak computation
 ```
+
+See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for engineering decisions (custom tokenizer, from-scratch SM-2, Prisma+SQLite, Web Speech API, testing strategy) and known limitations.
 
 ---
 
@@ -133,12 +160,27 @@ npm run dev                  # http://localhost:3000
 ### Scripts
 
 ```bash
-npm run dev       # development server (Turbopack)
-npm run build     # production build + typecheck
-npm run start     # serve the production build
-npm run lint      # ESLint (Next.js + react-hooks v6 rules)
-npm test          # Vitest unit tests
+npm run dev            # development server (Turbopack)
+npm run build          # production build + typecheck
+npm run start          # serve the production build
+npm run lint           # ESLint (Next.js + react-hooks v6 rules)
+npm test               # Vitest unit tests
+npm run datasets:check # validate bundled datasets + report update dates
 ```
+
+---
+
+## Deployment notes
+
+- **Static-hostable except the DB**: pages and API routes are served by Next.js; the SQLite
+  database must live on the server's filesystem (Prisma driver adapter, no env URL needed).
+- **Monthly dataset refresh** is required by the EDRDG license for web-facing dictionary apps:
+  run `npm run datasets:check`, then follow the refresh workflow in
+  `scripts/update-datasets.ts` and commit the new snapshots with their dates.
+- **TTS is browser-native**: no server speech service; synthesis quality depends on the
+  visitor's installed Japanese voice. The app degrades silently if speech is unavailable.
+- **Kanji stroke-order** is the only feature needing the network (KanjiVG SVGs fetched at
+  runtime); everything else works offline after the initial page load.
 
 ---
 
@@ -165,7 +207,10 @@ from the dataset until the requested limit is met.
 |---|---|---|
 | `/api/review/queue?type=&level=&limit=` | GET | Review queue (`vocab`/`kanji`/`kana`/`grammar`, level `N5`–`N1`) |
 | `/api/review` | POST | Submit `{ cardId, grade }` → SM-2 update + stats |
-| `/api/quiz?type=&level=&n=` | GET | Quiz questions with options |
+| `/api/quiz?type=&level=&n=&direction=&seed=` | GET | Quiz questions (validated, seeded-deterministic) |
+| `/api/listening?level=&n=&seed=` | GET | Listening questions with meaningful distractors |
+| `/api/cards` | POST | Ensure a card exists (`{ type, sourceId, front, back, reading, level }`) |
+| `/api/session/newwords?level=&n=` | GET | Unseen vocab words for the daily session |
 | `/api/stats` | GET | Dashboard stats + daily history |
 
 ---
@@ -186,6 +231,9 @@ Stroke-order animations are rendered from **[KanjiVG](https://kanjivg.github.io/
 fetched at runtime from the KanjiVG GitHub repository (network required for that feature only).
 
 Stories and conversation scripts are original, written for this project.
+
+The full per-dataset attribution (source, license, update date) is shown on the
+[About page](https://localhost:3000/about) and documented in the repo.
 
 This project is for language-learning and portfolio purposes only.
 
