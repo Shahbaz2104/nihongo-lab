@@ -140,6 +140,52 @@ const OVERRIDES: Override[] = [
   { text: "また会いましょう", reading: "またあいましょう", meanings: ["let's meet again"] },
   { text: "どちら", reading: "どちら", meanings: ["which / which one"] },
   { text: "私", reading: "わたし", meanings: ["I / me"] },
+  { text: "東京", reading: "とうきょう", meanings: ["Tokyo"] },
+  { text: "食べられませんでした", reading: "たべられませんでした", meanings: ["could not eat"] },
+  { text: "おもしろくありません", reading: "おもしろくありません", meanings: ["is not interesting"] },
+  { text: "行ってきました", reading: "いってきました", meanings: ["went and came back"] },
+  { text: "行ってきます", reading: "いってきます", meanings: ["will go and come back"] },
+  { text: "読んでいます", reading: "よんでいます", meanings: ["reading (progressive)"] },
+  { text: "飲んでいます", reading: "のんでいる", meanings: ["drinking (progressive)"] },
+  { text: "食べています", reading: "たべています", meanings: ["eating (progressive)"] },
+  { text: "働いています", reading: "はたらいています", meanings: ["working (progressive)"] },
+  { text: "待っています", reading: "まっています", meanings: ["waiting"] },
+  { text: "飲みました", reading: "のみました", meanings: ["drank"] },
+  { text: "飲みます", reading: "のみます", meanings: ["to drink"] },
+  { text: "飲みたい", reading: "のみたい", meanings: ["want to drink"] },
+  { text: "飲みません", reading: "のみません", meanings: ["do not drink"] },
+  { text: "飲んで", reading: "のんで", meanings: ["drink (te-form)"] },
+  { text: "見ました", reading: "みました", meanings: ["saw / watched"] },
+  { text: "見ます", reading: "みます", meanings: ["to see / watch"] },
+  { text: "見ません", reading: "みません", meanings: ["do not see"] },
+  { text: "見たい", reading: "みたい", meanings: ["want to see"] },
+  { text: "見て", reading: "みて", meanings: ["see (te-form)"] },
+  { text: "読んで", reading: "よんで", meanings: ["read (te-form)"] },
+  { text: "食べて", reading: "たべて", meanings: ["eat (te-form)"] },
+  { text: "書きました", reading: "かきました", meanings: ["wrote"] },
+  { text: "書きます", reading: "かきます", meanings: ["to write"] },
+  { text: "歩きました", reading: "あるきました", meanings: ["walked"] },
+  { text: "歩きます", reading: "あるきます", meanings: ["to walk"] },
+  { text: "泳ぎました", reading: "およぎました", meanings: ["swam"] },
+  { text: "泳ぎます", reading: "およぎます", meanings: ["to swim"] },
+  { text: "作りました", reading: "つくりました", meanings: ["made"] },
+  { text: "作ります", reading: "つくります", meanings: ["to make"] },
+  { text: "待ちます", reading: "まちます", meanings: ["to wait"] },
+  { text: "持ちます", reading: "もちます", meanings: ["to hold / carry"] },
+  { text: "聞きました", reading: "ききました", meanings: ["listened / asked"] },
+  { text: "聞きます", reading: "ききます", meanings: ["to listen / ask"] },
+  { text: "使いました", reading: "つかいました", meanings: ["used"] },
+  { text: "使います", reading: "つかいます", meanings: ["to use"] },
+  { text: "会いました", reading: "あいました", meanings: ["met"] },
+  { text: "会います", reading: "あいます", meanings: ["to meet"] },
+  { text: "遊びます", reading: "あそびます", meanings: ["to play"] },
+  { text: "遊んで", reading: "あそんで", meanings: ["play (te-form)"] },
+  { text: "住んでいます", reading: "すんでいます", meanings: ["living (progressive)"] },
+  { text: "住んで", reading: "すんで", meanings: ["live (te-form)"] },
+  { text: "聞いてください", reading: "きいてください", meanings: ["please listen / ask"] },
+  { text: "見てください", reading: "みてください", meanings: ["please look"] },
+  { text: "行ってください", reading: "いってください", meanings: ["please go"] },
+  { text: "待ってください", reading: "まってください", meanings: ["please wait"] },
 ];
 
 const OVERRIDE_SORTED = OVERRIDES.slice().sort((a, b) => b.text.length - a.text.length);
@@ -168,6 +214,8 @@ function getIndex(): Map<string, VocabItem[]> {
   for (const level of ["N5", "N4", "N3", "N2", "N1"] as JlptLevel[]) {
     for (const item of getVocab(level)) {
       if (PARTICLE_TEXTS.has(item.word) && item.word.length <= 2) continue;
+      if (!item.reading) continue;
+      if (item.word === "今日は") continue;
       if (JUNK_READING.test(item.reading)) continue;
       const first = item.word[0];
       let bucket = index.get(first);
@@ -207,6 +255,25 @@ export function tokenize(text: string): Token[] {
         type: "word",
       });
       i += override.text.length;
+      continue;
+    }
+
+    // 今日は is ambiguous: it is a standalone greeting (こんにちは) only when
+    // nothing follows it. Otherwise it is 今日 (today) + the topic particle は.
+    if (
+      ch === "今" &&
+      text.startsWith("今日は", i) &&
+      /^[\s。、！？!?.…]*$/.test(text.slice(i + 3))
+    ) {
+      tokens.push({
+        text: "今日は",
+        reading: "こんにちは",
+        romaji: "konnichiwa",
+        meanings: ["hello / good day"],
+        level: null,
+        type: "word",
+      });
+      i += 3;
       continue;
     }
 
@@ -250,8 +317,12 @@ export function tokenize(text: string): Token[] {
 
     const kanjiInfo = /[\u3400-\u4dbf\u4e00-\u9fff]/.test(ch) ? kanjiIndex.get(ch) : undefined;
     if (kanjiInfo) {
-      const reading =
-        kanjiInfo.kunyomi.find((k) => /^[\u3040-\u30ff]+$/.test(k)) ?? kanjiInfo.onyomi[0] ?? "";
+      // Kunyomi use the dictionary dot convention (た.べる); normalize before
+      // the kana-only test so the kunyomi wins over the onyomi fallback.
+      const kunyomi = kanjiInfo.kunyomi
+        .map((k) => k.replace(/[・.]/g, ""))
+        .filter((k) => /^[\u3040-\u30ff]+$/.test(k));
+      const reading = kunyomi[0] ?? kanjiInfo.onyomi[0] ?? "";
       tokens.push({
         text: ch,
         reading,

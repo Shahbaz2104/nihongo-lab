@@ -24,6 +24,13 @@ function loadVoices(): Promise<SpeechSynthesisVoice[]> {
   return voicesPromise;
 }
 
+/** Cancel any current playback. Safe to call after unmount. */
+export function cancelSpeech() {
+  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
 /**
  * Speak Japanese text. Resolves when playback finishes (or immediately if the
  * Web Speech API is unavailable). Cancels any currently-playing utterance first.

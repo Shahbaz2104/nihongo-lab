@@ -1,7 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import type { Token } from "@/lib/tokenizer";
 import { Furigana } from "@/components/Furigana";
 
 export function HoverText({ tokens, className }: { tokens: Token[]; className?: string }) {
+  const [open, setOpen] = useState<number | null>(null);
+
   return (
     <span className={className}>
       {tokens.map((t, i) => {
@@ -14,14 +19,35 @@ export function HoverText({ tokens, className }: { tokens: Token[]; className?: 
             ? "right-0"
             : "left-1/2 -translate-x-1/2";
 
+        const isOpen = open === i;
+
         return (
-          <span
-            key={i}
-            className="group/word relative mx-0.5 inline-block cursor-help rounded-sm transition-colors hover:bg-accent-soft"
-          >
-            <Furigana word={t.text} reading={t.reading} />
+          <span key={i} className="group/word relative mx-0.5 inline-block">
+            <button
+              type="button"
+              aria-expanded={isOpen}
+              aria-label={`${t.text} (${t.reading}) — ${t.meanings.slice(0, 3).join(", ")}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(isOpen ? null : i);
+              }}
+              onFocus={() => setOpen(i)}
+              onBlur={() => setOpen((cur) => (cur === i ? null : cur))}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  setOpen(null);
+                }
+              }}
+              className="cursor-help rounded-sm transition-colors hover:bg-accent-soft focus-visible:bg-accent-soft"
+            >
+              <Furigana word={t.text} reading={t.reading} />
+            </button>
             <span
-              className={`pointer-events-none absolute top-full z-30 mt-2 hidden w-max max-w-[min(16rem,72vw)] whitespace-normal rounded-xl border border-line bg-panel-2/95 px-3 py-2 text-left shadow-2xl shadow-black/60 backdrop-blur-sm group-hover/word:block ${align}`}
+              role="tooltip"
+              className={`pointer-events-none absolute top-full z-30 mt-2 w-max max-w-[min(16rem,72vw)] whitespace-normal rounded-xl border border-line bg-panel-2/95 px-3 py-2 text-left shadow-2xl shadow-black/60 backdrop-blur-sm ${align} ${
+                isOpen ? "block" : "hidden group-hover/word:block"
+              }`}
             >
               <span className="mb-1 flex flex-wrap items-baseline gap-x-2 text-xs">
                 <span className="font-jp text-sm font-bold text-accent">{t.text}</span>

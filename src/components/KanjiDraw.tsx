@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Eraser } from "@phosphor-icons/react";
 
 interface Props {
@@ -13,14 +13,26 @@ export function KanjiDraw({ character, size = 200 }: Props) {
   const drawing = useRef(false);
   const [opacity, setOpacity] = useState(0.25);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    canvas.getContext("2d")!.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
+  }, [size]);
+
   const pos = (e: React.PointerEvent) => {
     const rect = canvasRef.current!.getBoundingClientRect();
     return { x: ((e.clientX - rect.left) / rect.width) * size, y: ((e.clientY - rect.top) / rect.height) * size };
   };
 
   const start = (e: React.PointerEvent) => {
-    drawing.current = true;
     const canvas = canvasRef.current!;
+    canvas.setPointerCapture(e.pointerId);
+    drawing.current = true;
     const ctx = canvas.getContext("2d")!;
     const p = pos(e);
     ctx.beginPath();
@@ -39,8 +51,11 @@ export function KanjiDraw({ character, size = 200 }: Props) {
     ctx.stroke();
   };
 
-  const stop = () => {
+  const stop = (e: React.PointerEvent) => {
     drawing.current = false;
+    if (canvasRef.current?.hasPointerCapture(e.pointerId)) {
+      canvasRef.current.releasePointerCapture(e.pointerId);
+    }
   };
 
   const clear = () => {
@@ -58,6 +73,7 @@ export function KanjiDraw({ character, size = 200 }: Props) {
           onPointerDown={start}
           onPointerMove={move}
           onPointerUp={stop}
+          onPointerCancel={stop}
           onPointerLeave={stop}
           role="img"
           aria-label={`Practice drawing ${character}`}

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SpeakerHigh, SpeakerSlash } from "@phosphor-icons/react";
-import { speakJapanese, speakJapaneseSequence } from "@/lib/tts";
+import { cancelSpeech, speakJapanese, speakJapaneseSequence } from "@/lib/tts";
 import { IconButton } from "@/components/ui/IconButton";
 
 interface Props {
@@ -14,7 +14,16 @@ interface Props {
 
 export function SpeakButton({ text, size = "md", className, label = "Listen" }: Props) {
   const [playing, setPlaying] = useState(false);
+  const mounted = useRef(true);
   const iconSize = size === "sm" ? 14 : 18;
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      cancelSpeech();
+    };
+  }, []);
 
   const play = () => {
     if (playing) return;
@@ -22,7 +31,9 @@ export function SpeakButton({ text, size = "md", className, label = "Listen" }: 
     const promise = Array.isArray(text)
       ? speakJapaneseSequence(text)
       : speakJapanese(text);
-    promise.finally(() => setPlaying(false));
+    promise.finally(() => {
+      if (mounted.current) setPlaying(false);
+    });
   };
 
   return (
