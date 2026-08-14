@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getVocab, getKanji, getGrammar, JLPT_LEVELS, type JlptLevel } from "@/lib/datasets";
+import { mulberry32, seededShuffle } from "@/lib/random";
 
 export const dynamic = "force-dynamic";
 
@@ -8,26 +9,6 @@ function parseN(raw: string | null): number | null {
   const n = Number(raw);
   if (!Number.isFinite(n) || n < 1) return null;
   return Math.min(Math.floor(n), 30);
-}
-
-function mulberry32(seed: number) {
-  let a = seed >>> 0;
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function shuffle<T>(arr: T[], rng: () => number): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 interface Question {
@@ -44,11 +25,11 @@ function withDistractors(
 ): Question[] {
   const unique = [...new Set(pool.filter(Boolean))];
   return base.map((p) => {
-    const distractors = shuffle(
+    const distractors = seededShuffle(
       unique.filter((a) => a !== p.answer),
       rng,
     ).slice(0, 3);
-    return { ...p, options: shuffle([...distractors, p.answer], rng) };
+    return { ...p, options: seededShuffle([...distractors, p.answer], rng) };
   });
 }
 
@@ -84,7 +65,7 @@ export async function GET(req: NextRequest) {
 
   if (type === "vocab") {
     const items = getVocab(level as JlptLevel);
-    const picked = shuffle(items, rng).slice(0, n);
+    const picked = seededShuffle(items, rng).slice(0, n);
     if (dir === "ej") {
       const base = picked.map((i) => ({
         prompt: i.meanings[0] ?? i.word,
@@ -105,7 +86,7 @@ export async function GET(req: NextRequest) {
 
   if (type === "kanji") {
     const items = getKanji(level as JlptLevel);
-    const picked = shuffle(items, rng).slice(0, n);
+    const picked = seededShuffle(items, rng).slice(0, n);
     if (dir === "kr") {
       const base = picked.map((i) => ({
         prompt: i.character,
@@ -126,7 +107,7 @@ export async function GET(req: NextRequest) {
   }
 
   const items = getGrammar(level as JlptLevel);
-  const picked = shuffle(items, rng).slice(0, n);
+  const picked = seededShuffle(items, rng).slice(0, n);
   const base = picked.map((i) => ({
     prompt: i.pattern,
     answer: i.meaning ?? i.pattern,

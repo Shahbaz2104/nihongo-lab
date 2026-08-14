@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
 import { GET as queueGet } from "@/app/api/review/queue/route";
 import { GET as quizGet } from "@/app/api/quiz/route";
+import { GET as listeningGet } from "@/app/api/listening/route";
 import { POST as reviewPost } from "@/app/api/review/route";
 
 function get(url: string) {
@@ -109,6 +110,56 @@ describe("GET /api/quiz — validation", () => {
         expect(new Set(q.options).size).toBe(q.options.length);
         expect(q.options.filter((o: string) => o === q.answer)).toHaveLength(1);
       }
+    }
+  });
+});
+
+describe("GET /api/listening — validation and generation", () => {
+  it("rejects invalid params", async () => {
+    const res = await listeningGet(get("http://localhost/api/listening?level=N9"));
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects a non-numeric n", async () => {
+    const res = await listeningGet(get("http://localhost/api/listening?level=N5&n=abc"));
+    expect(res.status).toBe(400);
+  });
+
+  it("is deterministic for the same seed", async () => {
+    const a = await (await listeningGet(get("http://localhost/api/listening?level=N5&n=3&seed=7"))).json();
+    const b = await (await listeningGet(get("http://localhost/api/listening?level=N5&n=3&seed=7"))).json();
+    expect(a).toEqual(b);
+  });
+
+  it("serves questions with unique options and exactly one answer", async () => {
+    const res = await listeningGet(get("http://localhost/api/listening?level=N5&n=4&seed=7"));
+    expect(res.status).toBe(200);
+    const { questions } = await res.json();
+    expect(questions.length).toBe(4);
+    for (const q of questions) {
+      expect(q.options.length).toBe(4);
+      expect(new Set(q.options).size).toBe(q.options.length);
+      expect(q.options.filter((o: string) => o === q.answer)).toHaveLength(1);
+      expect(q.jp).toBe(q.answer);
+      expect(Array.isArray(q.tokens)).toBe(true);
+      expect(q.tokens.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("prefers distractors that share vocabulary with the answer", async () => {
+    const res = await listeningGet(get("http://localhost/api/listening?level=N5&n=4&seed=3"));
+    const { questions } = (await res.json()) as {
+      questions: {
+        jp: string;
+        answer: string;
+        options: string[];
+        tokens: { text: string; type: string }[];
+      }[];
+    };
+    for (const q of questions) {
+      const answerTokens = new Set(q.tokens.filter((t) => t.type !== "char").map((t) => t.text));
+      const sharing = q.options.filter((o) => o !== q.answer && [...answerTokens].some((w) => o.includes(w)));
+      expect(sharing.length).toBeGreaterThanOrEqual(1);
     }
   });
 });

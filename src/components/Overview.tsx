@@ -9,6 +9,7 @@ import {
   Books,
   Cards,
   ChartBar,
+  Ear,
   ListDashes,
   PencilSimpleLine,
   TextAa,
@@ -26,6 +27,7 @@ const modules = [
   { href: "/stories", label: "Stories", desc: "Graded reading and conversation", icon: BookOpen, featured: true },
   { href: "/grammar", label: "Grammar", desc: "Patterns with examples", icon: ListDashes },
   { href: "/quiz", label: "Quiz", desc: "Multiple-choice tests", icon: Trophy },
+  { href: "/listening", label: "Listening", desc: "Hear and identify sentences", icon: Ear },
   { href: "/stats", label: "Stats", desc: "Progress and activity", icon: ChartBar },
 ];
 

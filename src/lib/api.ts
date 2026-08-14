@@ -1,5 +1,7 @@
 export type Grade = "again" | "hard" | "good" | "easy";
 
+import type { Token } from "@/lib/tokenizer";
+
 export interface ReviewCard {
   id: string;
   front: string;
@@ -20,6 +22,14 @@ export interface QuizQuestion {
   answer: string;
   alt: string | null;
   options: string[];
+}
+
+export interface ListeningQuestion {
+  jp: string;
+  en: string;
+  options: string[];
+  answer: string;
+  tokens: Token[];
 }
 
 export interface Stats {
@@ -74,6 +84,10 @@ export const api = {
     fetch(
       `/api/quiz?type=${type}&level=${level}&n=${n}${direction ? `&direction=${direction}` : ""}`,
     ).then((r) => j<{ questions: QuizQuestion[] }>(r)),
+  listening: (level: string, n = 5) =>
+    fetch(`/api/listening?level=${level}&n=${n}`).then((r) =>
+      j<{ questions: ListeningQuestion[] }>(r),
+    ),
   stats: () => fetch("/api/stats").then((r) => j<Stats>(r)),
   sessionNewWords: (level: string, n = 5) =>
     fetch(`/api/session/newwords?level=${level}&n=${n}`).then((r) =>
