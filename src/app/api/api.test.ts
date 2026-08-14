@@ -57,6 +57,58 @@ describe("GET /api/quiz — validation", () => {
     for (const q of questions) {
       expect(new Set(q.options).size).toBe(q.options.length);
       expect(q.options).toContain(q.answer);
+      expect(q.options.filter((o: string) => o === q.answer)).toHaveLength(1);
+    }
+  });
+
+  it("is deterministic for the same seed", async () => {
+    const a = await (await quizGet(get("http://localhost/api/quiz?type=vocab&level=N5&n=6&seed=42"))).json();
+    const b = await (await quizGet(get("http://localhost/api/quiz?type=vocab&level=N5&n=6&seed=42"))).json();
+    expect(a).toEqual(b);
+  });
+
+  it("rejects an invalid direction", async () => {
+    const res = await quizGet(get("http://localhost/api/quiz?type=vocab&level=N5&direction=xx"));
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects a direction not valid for the type", async () => {
+    const res = await quizGet(get("http://localhost/api/quiz?type=grammar&level=N5&direction=ej"));
+    expect(res.status).toBe(400);
+  });
+
+  it("serves english-to-japanese vocab questions", async () => {
+    const res = await quizGet(get("http://localhost/api/quiz?type=vocab&level=N5&n=5&direction=ej"));
+    expect(res.status).toBe(200);
+    const { questions } = await res.json();
+    for (const q of questions) {
+      expect(q.prompt).not.toMatch(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/);
+      expect(q.answer).toMatch(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/);
+      expect(q.options).toContain(q.answer);
+    }
+  });
+
+  it("serves kanji-to-reading questions", async () => {
+    const res = await quizGet(get("http://localhost/api/quiz?type=kanji&level=N5&n=5&direction=kr"));
+    expect(res.status).toBe(200);
+    const { questions } = await res.json();
+    for (const q of questions) {
+      expect(q.prompt.length).toBeLessThanOrEqual(3);
+      expect(q.answer).toMatch(/[\u3040-\u30ff]/);
+      expect(q.options).toContain(q.answer);
+      expect(new Set(q.options).size).toBe(q.options.length);
+    }
+  });
+
+  it("serves non-duplicate options for kanji and grammar", async () => {
+    for (const type of ["kanji", "grammar"]) {
+      const res = await quizGet(get(`http://localhost/api/quiz?type=${type}&level=N5&n=5&seed=7`));
+      expect(res.status).toBe(200);
+      const { questions } = await res.json();
+      for (const q of questions) {
+        expect(new Set(q.options).size).toBe(q.options.length);
+        expect(q.options.filter((o: string) => o === q.answer)).toHaveLength(1);
+      }
     }
   });
 });

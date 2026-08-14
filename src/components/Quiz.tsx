@@ -17,9 +17,30 @@ const types = [
   { id: "grammar", label: "Grammar", speak: false },
 ];
 
+const directions: Record<string, { id: string; label: string }[]> = {
+  vocab: [
+    { id: "je", label: "→ English" },
+    { id: "ej", label: "→ Japanese" },
+  ],
+  kanji: [
+    { id: "km", label: "→ Meaning" },
+    { id: "kr", label: "→ Reading" },
+  ],
+  grammar: [{ id: "m", label: "→ Meaning" }],
+};
+
+const subtitles: Record<string, string> = {
+  je: "What does it mean?",
+  ej: "Which word means this?",
+  km: "What does it mean?",
+  kr: "What's the reading?",
+  m: "What does it mean?",
+};
+
 export function Quiz() {
   const [type, setType] = useState("vocab");
   const [level, setLevel] = useState("N5");
+  const [direction, setDirection] = useState("je");
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
@@ -32,7 +53,7 @@ export function Quiz() {
   useEffect(() => {
     let alive = true;
     api
-      .quiz(type, level, 10)
+      .quiz(type, level, 10, direction)
       .then(({ questions }) => {
         if (alive) {
           setQuestions(questions);
@@ -45,7 +66,7 @@ export function Quiz() {
     return () => {
       alive = false;
     };
-  }, [type, level, round]);
+  }, [type, level, direction, round]);
 
   const startNew = () => {
     setRound((r) => r + 1);
@@ -57,7 +78,8 @@ export function Quiz() {
   };
 
   const q = questions[index];
-  const speakEnabled = types.find((t) => t.id === type)?.speak;
+  const baseSpeak = types.find((t) => t.id === type)?.speak;
+  const speakEnabled = baseSpeak && !(type === "vocab" && direction === "ej");
 
   const pick = (option: string) => {
     if (picked) return;
@@ -78,6 +100,12 @@ export function Quiz() {
 
   const changeType = (id: string) => {
     setType(id);
+    setDirection(directions[id][0].id);
+    startNew();
+  };
+
+  const changeDirection = (id: string) => {
+    setDirection(id);
     startNew();
   };
 
@@ -87,7 +115,7 @@ export function Quiz() {
   };
 
   useEffect(() => {
-    if (loading || done || picked) return;
+    if (loading || done || picked || !q) return;
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
       if (t && ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName)) return;
@@ -95,13 +123,17 @@ export function Quiz() {
         const opt = q.options[Number(e.key) - 1];
         if (opt) {
           e.preventDefault();
-          pick(opt);
+          setPicked(opt);
+          if (opt === q.answer) {
+            setScore((s) => s + 1);
+            if (speakEnabled) speakJapanese(q.prompt);
+          }
         }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  });
+  }, [loading, done, picked, q, speakEnabled]);
 
   return (
     <div className="space-y-6">
@@ -116,6 +148,13 @@ export function Quiz() {
             value={type}
             onChange={changeType}
           />
+          {directions[type].length > 1 && (
+            <SegmentedControl
+              options={directions[type]}
+              value={direction}
+              onChange={changeDirection}
+            />
+          )}
           <LevelSelector value={level} onChange={changeLevel} />
           <Button variant="secondary" size="sm" onClick={startNew}>
             New quiz
@@ -182,7 +221,7 @@ export function Quiz() {
               {q.prompt}
             </button>
             {q.alt && <div className="mt-2 text-sm text-muted">{q.alt}</div>}
-            <div className="mt-2 text-xs text-muted">What does it mean?</div>
+            <div className="mt-2 text-xs text-muted">{subtitles[direction]}</div>
 
             <div className="mt-8 grid gap-2 px-6" role="group" aria-label="Answer options">
               {q.options.map((o, i) => {

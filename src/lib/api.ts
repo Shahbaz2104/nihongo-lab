@@ -59,9 +59,9 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     }).then((r) => j<{ ok: boolean; id: string; created: boolean }>(r)),
-  quiz: (type: string, level: string, n = 10) =>
-    fetch(`/api/quiz?type=${type}&level=${level}&n=${n}`).then((r) =>
-      j<{ questions: QuizQuestion[] }>(r),
-    ),
+  quiz: (type: string, level: string, n = 10, direction?: string) =>
+    fetch(
+      `/api/quiz?type=${type}&level=${level}&n=${n}${direction ? `&direction=${direction}` : ""}`,
+    ).then((r) => j<{ questions: QuizQuestion[] }>(r)),
   stats: () => fetch("/api/stats").then((r) => j<Stats>(r)),
 };

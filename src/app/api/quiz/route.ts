@@ -10,10 +10,59 @@ function parseN(raw: string | null): number | null {
   return Math.min(Math.floor(n), 30);
 }
 
+function mulberry32(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function shuffle<T>(arr: T[], rng: () => number): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+interface Question {
+  prompt: string;
+  answer: string;
+  alt: string | null;
+  options: string[];
+}
+
+function withDistractors(
+  base: { prompt: string; answer: string; alt: string | null }[],
+  pool: string[],
+  rng: () => number,
+): Question[] {
+  const unique = [...new Set(pool.filter(Boolean))];
+  return base.map((p) => {
+    const distractors = shuffle(
+      unique.filter((a) => a !== p.answer),
+      rng,
+    ).slice(0, 3);
+    return { ...p, options: shuffle([...distractors, p.answer], rng) };
+  });
+}
+
+const DIRECTIONS: Record<string, string[]> = {
+  vocab: ["je", "ej"],
+  kanji: ["km", "kr"],
+  grammar: ["m"],
+};
+
 export async function GET(req: NextRequest) {
   const type = req.nextUrl.searchParams.get("type") ?? "vocab";
   const level = (req.nextUrl.searchParams.get("level") ?? "N5").toUpperCase();
   const n = parseN(req.nextUrl.searchParams.get("n"));
+  const direction = req.nextUrl.searchParams.get("direction") ?? "default";
 
   if (!["vocab", "kanji", "grammar"].includes(type) || !JLPT_LEVELS.includes(level as JlptLevel)) {
     return NextResponse.json({ error: "Invalid params" }, { status: 400 });
@@ -21,53 +70,68 @@ export async function GET(req: NextRequest) {
   if (n === null) {
     return NextResponse.json({ error: "Invalid n" }, { status: 400 });
   }
+  const allowed = DIRECTIONS[type];
+  const dir = direction === "default" ? allowed[0] : direction;
+  if (!allowed.includes(dir)) {
+    return NextResponse.json({ error: "Invalid direction" }, { status: 400 });
+  }
 
-  let prompts: { prompt: string; answer: string; alt: string | null }[] = [];
+  const seedRaw = req.nextUrl.searchParams.get("seed");
+  const seed = seedRaw !== null ? Number(seedRaw) : Math.floor(Math.random() * 2 ** 32);
+  const rng = Number.isFinite(seed) ? mulberry32(seed) : mulberry32(0);
+
+  let questions: Question[] = [];
 
   if (type === "vocab") {
     const items = getVocab(level as JlptLevel);
-    const answers = items.map((i) => i.meanings[0]).filter(Boolean);
-    const picked = shuffle(items).slice(0, n);
-    prompts = picked.map((i) => {
-      const answer = i.meanings[0] ?? i.word;
-      return { prompt: i.word, answer, alt: i.reading || null };
-    });
-    const withDistractors = addDistractors(prompts, answers);
-    return NextResponse.json({ questions: withDistractors });
+    const picked = shuffle(items, rng).slice(0, n);
+    if (dir === "ej") {
+      const base = picked.map((i) => ({
+        prompt: i.meanings[0] ?? i.word,
+        answer: i.word,
+        alt: i.reading || null,
+      }));
+      questions = withDistractors(base, items.map((i) => i.word), rng);
+    } else {
+      const base = picked.map((i) => ({
+        prompt: i.word,
+        answer: i.meanings[0] ?? i.word,
+        alt: i.reading || null,
+      }));
+      questions = withDistractors(base, items.map((i) => i.meanings[0]), rng);
+    }
+    return NextResponse.json({ questions });
   }
 
   if (type === "kanji") {
     const items = getKanji(level as JlptLevel);
-    const answers = items.map((i) => i.meanings[0]).filter(Boolean);
-    const picked = shuffle(items).slice(0, n);
-    prompts = picked.map((i) => ({ prompt: i.character, answer: i.meanings[0] ?? i.character, alt: i.onyomi[0] ?? null }));
-    return NextResponse.json({ questions: addDistractors(prompts, answers) });
+    const picked = shuffle(items, rng).slice(0, n);
+    if (dir === "kr") {
+      const base = picked.map((i) => ({
+        prompt: i.character,
+        answer: i.onyomi[0] ?? i.kunyomi[0] ?? i.character,
+        alt: i.meanings[0] ?? null,
+      }));
+      const readings = items.flatMap((i) => [i.onyomi[0], i.kunyomi[0]]);
+      questions = withDistractors(base, readings, rng);
+    } else {
+      const base = picked.map((i) => ({
+        prompt: i.character,
+        answer: i.meanings[0] ?? i.character,
+        alt: i.onyomi[0] ?? null,
+      }));
+      questions = withDistractors(base, items.map((i) => i.meanings[0]), rng);
+    }
+    return NextResponse.json({ questions });
   }
 
   const items = getGrammar(level as JlptLevel);
-  const answers = items.map((i) => i.meaning).filter(Boolean);
-  const picked = shuffle(items).slice(0, n);
-  prompts = picked.map((i) => ({ prompt: i.pattern, answer: i.meaning ?? i.pattern, alt: null }));
-  return NextResponse.json({ questions: addDistractors(prompts, answers) });
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function addDistractors(
-  prompts: { prompt: string; answer: string; alt: string | null }[],
-  pool: string[],
-) {
-  return prompts.map((p) => {
-    const options = shuffle(pool.filter((a) => a !== p.answer && a !== p.alt))
-      .slice(0, 3)
-      .concat(p.answer);
-    return { ...p, options: shuffle(options) };
-  });
+  const picked = shuffle(items, rng).slice(0, n);
+  const base = picked.map((i) => ({
+    prompt: i.pattern,
+    answer: i.meaning ?? i.pattern,
+    alt: null,
+  }));
+  questions = withDistractors(base, items.map((i) => i.meaning), rng);
+  return NextResponse.json({ questions });
 }

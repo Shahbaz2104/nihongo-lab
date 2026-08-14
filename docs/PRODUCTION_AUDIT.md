@@ -87,9 +87,9 @@ Severity key: **P0** = crash/corruption, **P1** = broken flow / correctness / a1
 
 ## P2 — Improvements
 
-### P2-11. Quiz keyboard listener re-attached every render
+### ~~P2-11. Quiz keyboard listener re-attached every render~~ (fixed)
 
-- **Location:** `src/components/Quiz.tsx:89-104` — effect without a dependency array re-subscribes on every render. Add proper deps or read latest state via refs.
+- **Location:** `src/components/Quiz.tsx` — effect now has proper deps (`loading`, `done`, `picked`, `q`, `speakEnabled`); listener re-subscribes only when question or phase changes, and pick logic is inlined so no stale closures.
 
 ### P2-12. `computeStreak` duplicated
 
@@ -134,6 +134,7 @@ Severity key: **P0** = crash/corruption, **P1** = broken flow / correctness / a1
 - Loading/empty/error states exist on the major pages (review, quiz, stats, vocab, kanji).
 - Dark-mode-only design token system is consistent; focus-visible styles and reduced-motion support are in place.
 - Grading flow (queue → POST → SM-2 → ReviewLog → DayStat) is correct for vocab/kanji/grammar at a single level.
+- Quiz generation (`src/app/api/quiz/route.ts`) is validated, level-scoped, and now seeded-deterministic; distractor pools are deduped so options can never contain duplicates, and each question has exactly one correct answer.
 
 ---
 
