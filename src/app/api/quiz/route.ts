@@ -3,13 +3,23 @@ import { getVocab, getKanji, getGrammar, JLPT_LEVELS, type JlptLevel } from "@/l
 
 export const dynamic = "force-dynamic";
 
+function parseN(raw: string | null): number | null {
+  if (raw === null) return 10;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 1) return null;
+  return Math.min(Math.floor(n), 30);
+}
+
 export async function GET(req: NextRequest) {
   const type = req.nextUrl.searchParams.get("type") ?? "vocab";
   const level = (req.nextUrl.searchParams.get("level") ?? "N5").toUpperCase();
-  const n = Math.min(30, Number(req.nextUrl.searchParams.get("n") ?? 10));
+  const n = parseN(req.nextUrl.searchParams.get("n"));
 
   if (!["vocab", "kanji", "grammar"].includes(type) || !JLPT_LEVELS.includes(level as JlptLevel)) {
     return NextResponse.json({ error: "Invalid params" }, { status: 400 });
+  }
+  if (n === null) {
+    return NextResponse.json({ error: "Invalid n" }, { status: 400 });
   }
 
   let prompts: { prompt: string; answer: string; alt: string | null }[] = [];

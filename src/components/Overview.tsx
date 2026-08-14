@@ -15,6 +15,7 @@ import {
   Trophy,
 } from "@phosphor-icons/react";
 import { api, type Stats } from "@/lib/api";
+import { computeStreak } from "@/lib/dates";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 const modules = [
@@ -27,20 +28,6 @@ const modules = [
   { href: "/quiz", label: "Quiz", desc: "Multiple-choice tests", icon: Trophy },
   { href: "/stats", label: "Stats", desc: "Progress and activity", icon: ChartBar },
 ];
-
-function computeStreak(history: Stats["history"]): number {
-  const active = new Set(history.filter((h) => h.reviews > 0).map((h) => h.date));
-  if (active.size === 0) return 0;
-  const fmt = (d: Date) => d.toISOString().slice(0, 10);
-  const cursor = new Date();
-  if (!active.has(fmt(cursor))) cursor.setDate(cursor.getDate() - 1);
-  let streak = 0;
-  while (active.has(fmt(cursor))) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
-}
 
 export function Overview() {
   const [stats, setStats] = useState<Stats | null>(null);

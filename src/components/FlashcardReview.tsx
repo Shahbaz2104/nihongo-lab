@@ -42,6 +42,7 @@ export function FlashcardReview({ type, level, limit = 20, onRestart }: Props) {
   const [failed, setFailed] = useState(false);
   const [done, setDone] = useState(false);
   const [session, setSession] = useState({ reviewed: 0, correct: 0 });
+  const [submitting, setSubmitting] = useState(false);
   const reduce = useReducedMotion();
 
   useEffect(() => {
@@ -76,17 +77,22 @@ export function FlashcardReview({ type, level, limit = 20, onRestart }: Props) {
 
   const grade = useCallback(
     async (g: Grade) => {
-      if (!card) return;
-      await api.review(card.id, g);
-      setSession((s) => ({ reviewed: s.reviewed + 1, correct: s.correct + (g !== "again" ? 1 : 0) }));
-      if (index + 1 >= queue.length) {
-        setDone(true);
-      } else {
-        setRevealed(false);
-        setIndex((i) => i + 1);
+      if (!card || submitting) return;
+      setSubmitting(true);
+      try {
+        await api.review(card.id, g);
+        setSession((s) => ({ reviewed: s.reviewed + 1, correct: s.correct + (g !== "again" ? 1 : 0) }));
+        if (index + 1 >= queue.length) {
+          setDone(true);
+        } else {
+          setRevealed(false);
+          setIndex((i) => i + 1);
+        }
+      } finally {
+        setSubmitting(false);
       }
     },
-    [card, index, queue.length],
+    [card, index, queue.length, submitting],
   );
 
   useEffect(() => {
@@ -262,7 +268,8 @@ export function FlashcardReview({ type, level, limit = 20, onRestart }: Props) {
               <button
                 key={g}
                 onClick={() => grade(g)}
-                className={`press rounded-xl px-3 py-4 text-sm font-semibold transition-colors ${gradeStyles[g]}`}
+                disabled={submitting}
+                className={`press rounded-xl px-3 py-4 text-sm font-semibold transition-colors disabled:cursor-wait disabled:opacity-60 ${gradeStyles[g]}`}
               >
                 <span>{gradeHints[g]}</span>
                 <kbd className="kbd ml-1.5">{i + 1}</kbd>

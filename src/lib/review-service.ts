@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { getVocab, getKanji, getGrammar, getKana, type JlptLevel } from "@/lib/datasets";
 import { newCardState, reviewCard, type Grade } from "@/lib/srs";
 import { readingLine } from "@/lib/annotate";
+import { dayKey } from "@/lib/dates";
 
 export type CardType = "vocab" | "kanji" | "kana" | "grammar";
 
@@ -13,11 +14,6 @@ interface DatasetEntry {
   example: string | null;
   exampleFuri: string | null;
 }
-
-const dayStart = (d: Date) => {
-  const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  return dt.toISOString().slice(0, 10);
-};
 
 function datasetEntries(type: CardType, level?: JlptLevel): DatasetEntry[] {
   switch (type) {
@@ -69,8 +65,11 @@ function datasetEntries(type: CardType, level?: JlptLevel): DatasetEntry[] {
 
 export async function getReviewQueue(type: CardType, level: JlptLevel, limit = 20) {
   const entries = datasetEntries(type, level);
+  // Kana has no JLPT level: its cards must be matched regardless of the level
+  // parameter, otherwise re-queueing at a different level re-creates every
+  // kana card and violates the unique constraint on [type, sourceId].
   const existing = await db.card.findMany({
-    where: { type, level },
+    where: type === "kana" ? { type } : { type, level },
     orderBy: { due: "asc" },
   });
 
@@ -96,7 +95,7 @@ export async function getReviewQueue(type: CardType, level: JlptLevel, limit = 2
         reading: e.reading,
         example: e.example,
         exampleFuri: e.exampleFuri,
-        level,
+        level: type === "kana" ? null : level,
         status: state.status,
         ease: state.ease,
         interval: state.interval,
@@ -108,7 +107,7 @@ export async function getReviewQueue(type: CardType, level: JlptLevel, limit = 2
     await db.card.createMany({ data: rows });
     const ids = rows.map((r) => r.sourceId);
     const inserted = await db.card.findMany({
-      where: { type, level, sourceId: { in: ids } },
+      where: type === "kana" ? { type, sourceId: { in: ids } } : { type, level, sourceId: { in: ids } },
     });
     created.push(...inserted);
   }
@@ -162,7 +161,7 @@ export async function submitReview(cardId: string, grade: Grade) {
     },
   });
 
-  const date = dayStart(now);
+  const date = dayKey(now);
   await db.dayStat.upsert({
     where: { date },
     create: { date, reviews: 1, learned: result.correct && card.status === 0 ? 1 : 0 },

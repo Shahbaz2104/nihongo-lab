@@ -5,13 +5,25 @@ import { gradeToQ } from "@/lib/srs";
 const GRADES = ["again", "hard", "good", "easy"] as const;
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { cardId, grade } = body;
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+  const { cardId, grade } = body as { cardId?: unknown; grade?: unknown };
 
-  if (typeof cardId !== "string" || !GRADES.includes(grade)) {
+  if (typeof cardId !== "string" || !GRADES.includes(grade as (typeof GRADES)[number])) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const result = await submitReview(cardId, grade);
-  return NextResponse.json({ ok: true, grade: gradeToQ(grade), ...result });
+  try {
+    const result = await submitReview(cardId, grade as (typeof GRADES)[number]);
+    return NextResponse.json({ ok: true, grade: gradeToQ(grade as (typeof GRADES)[number]), ...result });
+  } catch (err) {
+    if (err instanceof Error && err.message === "Card not found") {
+      return NextResponse.json({ error: "Card not found" }, { status: 404 });
+    }
+    throw err;
+  }
 }
