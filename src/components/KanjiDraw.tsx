@@ -44,7 +44,7 @@ export function KanjiDraw({ character, size = 200 }: Props) {
     const ctx = canvasRef.current!.getContext("2d")!;
     const p = pos(e);
     ctx.lineTo(p.x, p.y);
-    ctx.strokeStyle = "#e8ecf3";
+    ctx.strokeStyle = "#2b251d";
     ctx.lineWidth = 6;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -81,7 +81,7 @@ export function KanjiDraw({ character, size = 200 }: Props) {
         />
         <div
           className="pointer-events-none absolute inset-0 grid place-items-center font-jp text-6xl"
-          style={{ opacity, color: "#e8ecf3" }}
+          style={{ opacity, color: "#2b251d" }}
           aria-hidden
         >
           {character}

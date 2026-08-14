@@ -91,7 +91,7 @@ export function Session({ stories, conversations }: Props) {
                   i < step
                     ? "bg-good/15 text-good"
                     : i === step
-                      ? "bg-accent text-black"
+                      ? "bg-accent text-white"
                       : "bg-panel-2 text-muted"
                 }`}
               >

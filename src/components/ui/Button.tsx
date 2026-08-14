@@ -6,16 +6,16 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  primary: "bg-accent text-black hover:bg-accent/90",
+  primary: "bg-accent text-white shadow-warm hover:bg-accent/90",
   secondary:
-    "border border-line bg-panel text-foreground hover:border-accent/60 hover:text-accent",
+    "border border-line bg-panel text-foreground shadow-warm hover:border-accent/60 hover:text-accent",
   ghost: "text-muted hover:text-foreground",
 };
 
 const sizes = {
-  sm: "px-3 py-1.5 text-xs",
-  md: "px-4 py-2 text-sm",
-  lg: "px-6 py-3 text-base",
+  sm: "h-9 px-3 text-xs",
+  md: "h-11 px-5 text-sm",
+  lg: "h-12 px-7 text-base",
 };
 
 export function Button({

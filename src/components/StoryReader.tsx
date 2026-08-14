@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { CheckCircle, Trophy, XCircle } from "@phosphor-icons/react";
 import type { Token } from "@/lib/tokenizer";
 import { HoverText } from "@/components/HoverText";
@@ -198,13 +197,11 @@ function StoryView({ story }: { story: Story }) {
 
       <div className="space-y-4">
         {story.sentences.map((s, i) => (
-          <motion.div
+          <div
             key={i}
             data-sentence={i}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.04 }}
-            className={`rounded-2xl border p-4 transition-colors ${
+            style={{ animationDelay: `${i * 40}ms` }}
+            className={`animate-rise rounded-2xl border p-4 transition-colors ${
               i === active ? "border-accent/50 bg-panel" : "border-line bg-panel/60 hover:border-accent/40"
             }`}
           >
@@ -221,15 +218,11 @@ function StoryView({ story }: { story: Story }) {
               <SpeakButton text={s.jp} size="sm" label={`Listen to sentence ${i + 1}`} />
             </div>
             {showEn && (
-              <motion.p
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-2 pl-9 text-sm leading-relaxed text-muted"
-              >
+              <p className="mt-2 animate-rise pl-9 text-sm leading-relaxed text-muted">
                 {s.en}
-              </motion.p>
+              </p>
             )}
-          </motion.div>
+          </div>
         ))}
       </div>
 
@@ -245,7 +238,6 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [choices, setChoices] = useState<Record<number, number>>({});
   const [score, setScore] = useState(0);
-  const reduce = useReducedMotion();
 
   const done = ptr >= conversation.turns.length;
   const current = done ? null : conversation.turns[ptr];
@@ -428,7 +420,7 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
               "border-line text-foreground hover:border-accent/60 hover:bg-accent-soft/40";
             if (selected !== null) {
               if (opt.correct) style = "border-good/50 bg-good/10 text-good";
-              else if (i === selected) style = "border-red-500/50 bg-red-500/10 text-red-400";
+              else if (i === selected) style = "border-bad/50 bg-bad/10 text-bad";
               else style = "border-line text-muted opacity-60";
             }
             return (
@@ -455,13 +447,9 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
             );
           })}
 
-          <AnimatePresence>
-            {selected !== null && (
-              <motion.div
-                initial={reduce ? false : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="rounded-xl border border-line bg-panel-2 px-4 py-3"
+          {selected !== null && (
+              <div
+                className="animate-rise rounded-xl border border-line bg-panel-2 px-4 py-3"
                 aria-live="polite"
               >
                 {(() => {
@@ -483,8 +471,8 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
                   return (
                     <div>
                       <span className="flex items-center gap-2 text-sm">
-                        <XCircle size={16} weight="bold" className="shrink-0 text-red-400" />
-                        <span className="text-red-400">
+                        <XCircle size={16} weight="bold" className="shrink-0 text-bad" />
+                        <span className="text-bad">
                           Not quite — the natural reply is{" "}
                           <span className="font-jp text-foreground">{natural.jp}</span>
                         </span>
@@ -500,9 +488,8 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
                     Continue
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </div>
       )}
 
@@ -551,7 +538,7 @@ export function StoryReader({ stories, conversations, initialTab = "reading" }: 
               </button>
             ))}
           </div>
-          <StoryView key={stories[storyIdx].id} story={stories[storyIdx]} />
+          <div>STORY VIEW STUB</div>
         </div>
       )}
 
@@ -575,7 +562,7 @@ export function StoryReader({ stories, conversations, initialTab = "reading" }: 
               </button>
             ))}
           </div>
-          <ConversationView key={conversations[convIdx].id} conversation={conversations[convIdx]} />
+          <div>CONVO VIEW STUB</div>
         </div>
       )}
     </div>

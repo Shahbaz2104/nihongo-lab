@@ -171,7 +171,7 @@ export function KanaSection({ kana }: { kana: KanaItem[] }) {
                   let style = "border-line bg-panel hover:border-accent";
                   if (result !== null) {
                     if (o === current.romaji) style = "border-good/50 bg-good/15 text-good";
-                    else if (result === "wrong" && o === picked) style = "border-red-500/50 bg-red-500/15 text-red-400";
+                    else if (result === "wrong" && o === picked) style = "border-bad/50 bg-bad/10 text-bad";
                     else style = "border-line bg-panel opacity-50";
                   }
                   return (
@@ -197,7 +197,7 @@ export function KanaSection({ kana }: { kana: KanaItem[] }) {
                       exit={{ opacity: 0 }}
                       className="mt-6"
                     >
-                      <div className={result === "correct" ? "text-good" : "text-red-400"}>
+                      <div className={result === "correct" ? "text-good" : "text-bad"}>
                         {result === "correct" ? "Correct!" : `It was ${current.romaji}`}
                       </div>
                       <Button className="mt-4" onClick={pick}>

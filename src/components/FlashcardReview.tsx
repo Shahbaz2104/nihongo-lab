@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Cards } from "@phosphor-icons/react";
 import { api, type Grade, type ReviewCard } from "@/lib/api";
 import { speakJapanese } from "@/lib/tts";
@@ -10,6 +10,7 @@ import { SpeakButton } from "@/components/ui/SpeakButton";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { HankoStamp } from "@/components/ui/HankoStamp";
 
 interface Props {
   type: string;
@@ -22,17 +23,17 @@ interface Props {
 const gradeOrder: Grade[] = ["again", "hard", "good", "easy"];
 
 const gradeStyles: Record<Grade, string> = {
-  again: "bg-red-500/15 text-red-400 hover:bg-red-500/25",
-  hard: "bg-gold/15 text-gold hover:bg-gold/25",
-  good: "bg-green-500/15 text-green-400 hover:bg-green-500/25",
-  easy: "bg-indigo/15 text-indigo hover:bg-indigo/25",
+  again: "border-bad/25 bg-bad/10 text-bad hover:bg-bad/15",
+  hard: "border-gold/25 bg-gold/10 text-gold hover:bg-gold/15",
+  good: "border-good/25 bg-good/10 text-good hover:bg-good/15",
+  easy: "border-indigo/25 bg-indigo/10 text-indigo hover:bg-indigo/15",
 };
 
-const gradeHints: Record<Grade, string> = {
-  again: "Again",
-  hard: "Hard",
-  good: "Good",
-  easy: "Easy",
+const gradeLabels: Record<Grade, { jp: string; en: string }> = {
+  again: { jp: "もう一度", en: "Again" },
+  hard: { jp: "難しい", en: "Hard" },
+  good: { jp: "良い", en: "Good" },
+  easy: { jp: "簡単", en: "Easy" },
 };
 
 export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete }: Props) {
@@ -145,8 +146,8 @@ export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete
 
   if (failed) {
     return (
-      <div className="mx-auto max-w-lg rounded-2xl border border-line bg-panel p-10 text-center">
-        <div className="font-jp text-4xl">エラー</div>
+      <div className="mx-auto max-w-lg rounded-2xl border border-line bg-panel p-10 text-center shadow-warm">
+        <div className="font-display text-4xl font-bold text-foreground">エラー</div>
         <p className="mt-3 text-sm text-muted">
           Couldn&apos;t load the review queue. Check that the database is available and try again.
         </p>
@@ -160,21 +161,24 @@ export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete
   if (done || queue.length === 0) {
     const pct = queue.length === 0 ? null : Math.round((session.correct / Math.max(1, session.reviewed)) * 100);
     return (
-      <div className="mx-auto max-w-lg rounded-2xl border border-line bg-panel px-6 py-14 text-center">
+      <div className="mx-auto max-w-lg rounded-2xl border border-line bg-panel px-6 py-14 text-center shadow-warm">
         <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-accent-soft">
           <Cards size={32} weight="duotone" className="text-accent" />
         </div>
-        <div className="font-jp text-4xl font-bold">
+        <div className="font-display text-4xl font-bold text-foreground">
           {queue.length === 0 ? "終了" : "おつかれさま"}
         </div>
         {pct !== null ? (
           <>
-            <div className="mt-4 text-3xl font-bold tabular-nums">{pct}%</div>
+            <div className="mt-4 text-3xl font-bold tabular-nums text-foreground">{pct}%</div>
             <div className="mt-1 text-xs text-muted">
               {session.correct} / {session.reviewed} correct this session
             </div>
             {pct === 100 && (
-              <div className="mt-2 text-sm text-good">Perfect — 完璧！</div>
+              <div className="mt-3 flex items-center justify-center gap-3">
+                <div className="text-sm font-semibold text-accent">Perfect — 完璧！</div>
+                <HankoStamp label="完了" size={34} />
+              </div>
             )}
           </>
         ) : (
@@ -206,86 +210,90 @@ export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete
       </div>
       <ProgressBar value={(index + (revealed ? 0.5 : 0)) / queue.length} className="mb-5" />
 
-      <div aria-live="polite">
-        <AnimatePresence mode="wait">
+      <div aria-live="polite" className="[perspective:1600px]">
+        <motion.div
+          key={card.id}
+          initial={reduce ? false : { opacity: 0, scale: 0.985 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+          className="relative"
+          style={{ transformStyle: "preserve-3d" }}
+        >
           <motion.div
-            key={card.id}
-            initial={reduce ? false : { opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={reduce ? undefined : { opacity: 0, x: -40 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="overflow-hidden rounded-2xl border border-line bg-panel"
+            className="relative"
+            animate={{ rotateY: revealed ? 180 : 0 }}
+            transition={reduce ? { duration: 0 } : { duration: 0.55, ease: [0.32, 0.72, 0, 1] }}
+            style={{ transformStyle: "preserve-3d" }}
           >
-            <button
-              onClick={() => setRevealed((r) => !r)}
-              className="flex min-h-64 w-full cursor-pointer flex-col items-center justify-center gap-4 px-8 py-10"
-            >
-              <div className={`font-jp text-6xl font-bold tracking-wide ${isKanjiType ? "text-accent" : ""}`}>
-                {card.type === "vocab" ? (
-                  <Furigana word={card.front} reading={card.reading} />
-                ) : (
-                  card.front
-                )}
-              </div>
-              {!revealed && (
-                <div className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted">
-                  tap to reveal
-                  <kbd className="kbd">space</kbd>
+            <div className="flex min-h-72 w-full flex-col overflow-hidden rounded-2xl border border-line bg-panel shadow-warm [backface-visibility:hidden]">
+              <button
+                onClick={() => setRevealed((r) => !r)}
+                className="flex min-h-72 w-full cursor-pointer flex-col items-center justify-center gap-4 px-8 py-10"
+              >
+                <div className={`font-display text-6xl font-bold tracking-wide ${isKanjiType ? "text-accent" : "text-foreground"}`}>
+                  {card.type === "vocab" ? (
+                    <Furigana word={card.front} reading={card.reading} />
+                  ) : (
+                    card.front
+                  )}
                 </div>
-              )}
+                {!revealed && (
+                  <div className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted">
+                    tap to reveal
+                    <kbd className="kbd">space</kbd>
+                  </div>
+                )}
+              </button>
 
-              {revealed && (
-                <motion.div
-                  initial={reduce ? false : { opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex flex-col items-center gap-2 text-center"
-                >
-                  {card.reading && (
-                    <div className="font-jp text-2xl text-indigo">{card.reading}</div>
-                  )}
-                  <div className="text-lg">{card.back}</div>
-                  {card.example && (
-                    <div className="mt-3 rounded-xl bg-panel-2 px-4 py-3 text-sm">
-                      <div className="font-jp text-base text-foreground/90">{card.example}</div>
-                      {card.exampleFuri && <div className="mt-1 text-xs text-muted">{card.exampleFuri}</div>}
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </button>
-
-            <div className="flex items-center justify-between border-t border-line px-4 py-3">
-              <SpeakButton text={card.reading && !card.reading.includes(",") ? card.reading : card.front} />
-              <div className="text-xs text-muted">
-                {card.isNew ? "new" : `due in ${card.interval}d`}
+              <div className="flex items-center justify-between border-t border-line px-4 py-3">
+                <SpeakButton text={card.reading && !card.reading.includes(",") ? card.reading : card.front} />
+                <div className="text-xs text-muted">
+                  {card.isNew ? "new" : `due in ${card.interval}d`}
+                </div>
               </div>
             </div>
+
+            <div
+              className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border border-line bg-panel px-8 py-10 text-center shadow-warm"
+              style={{ transform: "rotateY(180deg)", backfaceVisibility: "hidden" }}
+            >
+              {card.reading && (
+                <div className="font-jp text-2xl text-indigo">{card.reading}</div>
+              )}
+              <div className="text-lg text-foreground">{card.back}</div>
+              {card.example && (
+                <div className="mt-3 rounded-xl bg-panel-2 px-4 py-3 text-sm">
+                  <div className="font-jp text-base text-foreground/90">{card.example}</div>
+                  {card.exampleFuri && <div className="mt-1 text-xs text-muted">{card.exampleFuri}</div>}
+                </div>
+              )}
+            </div>
           </motion.div>
-        </AnimatePresence>
+        </motion.div>
       </div>
 
-      <AnimatePresence>
-        {revealed && (
-          <motion.div
-            initial={reduce ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? undefined : { opacity: 0 }}
-            className="mt-4 grid grid-cols-4 gap-2"
+      <motion.div
+        initial={reduce ? false : { opacity: 0, y: 12 }}
+        animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+        className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4"
+        aria-hidden={!revealed}
+      >
+        {gradeOrder.map((g, i) => (
+          <button
+            key={g}
+            onClick={() => grade(g)}
+            disabled={submitting || !revealed}
+            tabIndex={revealed ? 0 : -1}
+            className={`press rounded-2xl border px-3 py-3.5 text-left transition-colors disabled:cursor-wait disabled:opacity-50 sm:text-center ${gradeStyles[g]}`}
           >
-            {gradeOrder.map((g, i) => (
-              <button
-                key={g}
-                onClick={() => grade(g)}
-                disabled={submitting}
-                className={`press rounded-xl px-3 py-4 text-sm font-semibold transition-colors disabled:cursor-wait disabled:opacity-60 ${gradeStyles[g]}`}
-              >
-                <span>{gradeHints[g]}</span>
-                <kbd className="kbd ml-1.5">{i + 1}</kbd>
-              </button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <span className="block font-display text-base font-bold leading-none">{gradeLabels[g].jp}</span>
+            <span className="mt-1.5 block text-[11px] opacity-80">
+              {gradeLabels[g].en} <kbd className="kbd ml-0.5">{i + 1}</kbd>
+            </span>
+          </button>
+        ))}
+      </motion.div>
 
       <div className="mt-4 text-center text-xs tabular-nums text-muted">
         session: {session.reviewed} reviewed · {session.correct} correct

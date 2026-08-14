@@ -106,7 +106,7 @@ export function HoverText({
                   saved === i
                     ? "border-good/40 bg-good/10 text-good"
                     : saved === -1
-                      ? "cursor-not-allowed border-red-500/40 text-red-400"
+                      ? "cursor-not-allowed border-red-500/40 text-bad"
                       : "border-line bg-panel text-muted hover:border-accent hover:text-foreground"
                 }`}
               >

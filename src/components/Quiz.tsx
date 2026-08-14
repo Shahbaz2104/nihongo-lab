@@ -59,11 +59,11 @@ export function Quiz({ initialType = "vocab", initialLevel = "N5", onComplete }:
 
   useEffect(() => {
     let alive = true;
-    setFailed(false);
     api
       .quiz(type, level, 10, direction)
       .then(({ questions }) => {
         if (alive) {
+          setFailed(false);
           setQuestions(questions);
           setLoading(false);
         }
@@ -256,7 +256,7 @@ export function Quiz({ initialType = "vocab", initialLevel = "N5", onComplete }:
                 let cls = "border-line bg-panel hover:border-accent";
                 if (picked) {
                   if (isAnswer) cls = "border-good/50 bg-good/15 text-good";
-                  else if (isPicked) cls = "border-red-500/50 bg-red-500/15 text-red-400";
+                  else if (isPicked) cls = "border-bad/50 bg-bad/10 text-bad";
                   else cls = "border-line bg-panel opacity-50";
                 }
                 return (
@@ -290,8 +290,8 @@ export function Quiz({ initialType = "vocab", initialLevel = "N5", onComplete }:
                         </>
                       ) : (
                         <>
-                          <XCircle size={16} weight="bold" className="shrink-0 text-red-400" />
-                          <span className="text-red-400">It was “{q.answer}”</span>
+                          <XCircle size={16} weight="bold" className="shrink-0 text-bad" />
+                          <span className="text-bad">It was “{q.answer}”</span>
                         </>
                       )}
                     </div>

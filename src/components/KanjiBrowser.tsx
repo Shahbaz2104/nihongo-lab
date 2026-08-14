@@ -134,7 +134,7 @@ export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }
               </div>
               <button
                 onClick={() => setSelected(null)}
-                className="press grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-line text-muted transition-colors hover:text-foreground"
+                className="press grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-line text-muted transition-colors hover:text-foreground"
                 aria-label="Close"
               >
                 <X size={14} />
@@ -175,7 +175,7 @@ export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }
               <button
                 onClick={() => step(-1)}
                 disabled={selectedIdx <= 0}
-                className="press flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                className="press flex h-9 items-center gap-1.5 rounded-xl px-3 text-xs font-medium text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <CaretLeft size={14} />
                 Previous
@@ -186,7 +186,7 @@ export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }
               <button
                 onClick={() => step(1)}
                 disabled={selectedIdx < 0 || selectedIdx >= filtered.length - 1}
-                className="press flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                className="press flex h-9 items-center gap-1.5 rounded-xl px-3 text-xs font-medium text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
                 <CaretRight size={14} />

@@ -27,11 +27,11 @@ export function Listening() {
 
   useEffect(() => {
     let alive = true;
-    setFailed(false);
     api
       .listening(level, 5)
       .then(({ questions }) => {
         if (alive) {
+          setFailed(false);
           setQuestions(questions);
           setLoading(false);
         }
@@ -161,7 +161,7 @@ export function Listening() {
                   onClick={play}
                   disabled={speaking}
                   aria-label="Play the sentence"
-                  className="press grid h-16 w-16 place-items-center rounded-full bg-accent text-black transition-transform hover:scale-105 disabled:opacity-60"
+                  className="press grid h-16 w-16 place-items-center rounded-full bg-accent text-white transition-transform hover:scale-105 disabled:opacity-60"
                 >
                   <Play size={26} weight="fill" />
                 </button>
@@ -186,7 +186,7 @@ export function Listening() {
                 let cls = "border-line bg-panel hover:border-accent";
                 if (picked) {
                   if (isAnswer) cls = "border-good/50 bg-good/15 text-good";
-                  else if (isPicked) cls = "border-red-500/50 bg-red-500/15 text-red-400";
+                  else if (isPicked) cls = "border-bad/50 bg-bad/10 text-bad";
                   else cls = "border-line bg-panel opacity-50";
                 }
                 return (
@@ -224,8 +224,8 @@ export function Listening() {
                         </>
                       ) : (
                         <>
-                          <XCircle size={16} weight="bold" className="shrink-0 text-red-400" />
-                          <span className="text-red-400">You heard: “{q.answer}”</span>
+                          <XCircle size={16} weight="bold" className="shrink-0 text-bad" />
+                          <span className="text-bad">You heard: “{q.answer}”</span>
                         </>
                       )}
                     </div>

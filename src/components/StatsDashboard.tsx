@@ -21,7 +21,7 @@ const STORY_KEY = "nl-story-progress:";
 export function StatsDashboard({ stories }: { stories: { id: string; sentences: number }[] }) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [failed, setFailed] = useState(false);
-  const [storiesCompleted, setStoriesCompleted] = useState<number | null>(() => {
+  const [storiesCompleted] = useState<number | null>(() => {
     try {
       if (typeof window === "undefined") return null;
       const total = new Map(stories.map((s) => [s.id, s.sentences]));
@@ -134,7 +134,7 @@ export function StatsDashboard({ stories }: { stories: { id: string; sentences: 
             />
             <YAxis tick={{ fill: "var(--color-muted)", fontSize: 10 }} allowDecimals={false} width={30} />
             <Tooltip
-              cursor={{ fill: "rgba(255,106,92,0.06)" }}
+              cursor={{ fill: "rgba(216,72,44,0.08)" }}
               contentStyle={{
                 background: "var(--color-elevated)",
                 border: "1px solid var(--color-line)",
