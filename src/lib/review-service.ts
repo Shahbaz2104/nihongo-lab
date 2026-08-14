@@ -128,6 +128,43 @@ export async function getReviewQueue(type: CardType, level: JlptLevel, limit = 2
   }));
 }
 
+/**
+ * Add a card from raw data (used by "add to review" in the story reader).
+ * Idempotent: returns the existing card if one already exists.
+ */
+export async function ensureCard(input: {
+  type: CardType;
+  sourceId: string;
+  front: string;
+  back: string;
+  reading: string | null;
+  level?: JlptLevel | null;
+}): Promise<{ id: string; created: boolean }> {
+  const existing = await db.card.findFirst({
+    where: { type: input.type, sourceId: input.sourceId },
+  });
+  if (existing) return { id: existing.id, created: false };
+
+  const state = newCardState();
+  const created = await db.card.create({
+    data: {
+      sourceId: input.sourceId,
+      type: input.type,
+      front: input.front,
+      back: input.back,
+      reading: input.reading,
+      level: input.level ?? null,
+      status: state.status,
+      ease: state.ease,
+      interval: state.interval,
+      reps: state.reps,
+      lapses: state.lapses,
+      due: state.due,
+    },
+  });
+  return { id: created.id, created: true };
+}
+
 export async function submitReview(cardId: string, grade: Grade) {
   const card = await db.card.findUnique({ where: { id: cardId } });
   if (!card) throw new Error("Card not found");

@@ -47,6 +47,18 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ cardId, grade }),
     }).then((r) => j<{ ok: boolean }>(r)),
+  addCard: (input: {
+    type: string;
+    sourceId: string;
+    front: string;
+    back: string;
+    reading: string | null;
+  }) =>
+    fetch("/api/cards", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    }).then((r) => j<{ ok: boolean; id: string; created: boolean }>(r)),
   quiz: (type: string, level: string, n = 10) =>
     fetch(`/api/quiz?type=${type}&level=${level}&n=${n}`).then((r) =>
       j<{ questions: QuizQuestion[] }>(r),

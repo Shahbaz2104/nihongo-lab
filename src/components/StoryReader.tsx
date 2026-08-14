@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { CheckCircle, Trophy, XCircle } from "@phosphor-icons/react";
 import type { Token } from "@/lib/tokenizer";
@@ -29,6 +29,7 @@ export interface ConversationChoice {
   en: string;
   tokens: Token[];
   correct: boolean;
+  why?: string;
 }
 
 export interface ConversationTurn {
@@ -75,9 +76,52 @@ function useActiveSentence(count: number) {
   return active;
 }
 
+function useStoryProgress(storyId: string, total: number) {
+  const KEY = `nl-story-progress:${storyId}`;
+  const [furthest, setFurthest] = useState(() => {
+    if (typeof window === "undefined") return -1;
+    try {
+      const n = Number(window.localStorage.getItem(KEY));
+      return Number.isFinite(n) && n >= 0 && n < total ? n : -1;
+    } catch {
+      return -1;
+    }
+  });
+
+  const mark = (idx: number) => {
+    if (idx > furthest) {
+      setFurthest(idx);
+      try {
+        window.localStorage.setItem(KEY, String(idx));
+      } catch {
+        /* storage may be unavailable (private mode) */
+      }
+    }
+  };
+
+  const reset = () => {
+    setFurthest(-1);
+    try {
+      window.localStorage.removeItem(KEY);
+    } catch {
+      /* noop */
+    }
+  };
+
+  return { furthest, mark, reset };
+}
+
 function StoryView({ story }: { story: Story }) {
   const [showEn, setShowEn] = useState(false);
+  const [showFurigana, setShowFurigana] = useState(true);
+  const [showRomaji, setShowRomaji] = useState(true);
   const active = useActiveSentence(story.sentences.length);
+  const { furthest, mark, reset } = useStoryProgress(story.id, story.sentences.length);
+  const complete = furthest === story.sentences.length - 1;
+
+  useEffect(() => {
+    mark(active);
+  }, [active, mark]);
 
   return (
     <div className="space-y-5">
@@ -91,7 +135,7 @@ function StoryView({ story }: { story: Story }) {
           </div>
           <p className="mt-1 text-sm text-muted">{story.titleEn}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <label className="flex cursor-pointer items-center gap-2 text-xs text-muted">
             <input
               type="checkbox"
@@ -99,7 +143,25 @@ function StoryView({ story }: { story: Story }) {
               onChange={(e) => setShowEn(e.target.checked)}
               className="accent-[--color-accent]"
             />
-            Show English
+            English
+          </label>
+          <label className="flex cursor-pointer items-center gap-2 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={showFurigana}
+              onChange={(e) => setShowFurigana(e.target.checked)}
+              className="accent-[--color-accent]"
+            />
+            ふりがな
+          </label>
+          <label className="flex cursor-pointer items-center gap-2 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={showRomaji}
+              onChange={(e) => setShowRomaji(e.target.checked)}
+              className="accent-[--color-accent]"
+            />
+            Romaji
           </label>
           <SpeakButton
             text={story.sentences.map((s) => s.jp)}
@@ -114,6 +176,24 @@ function StoryView({ story }: { story: Story }) {
           sentence {active + 1} / {story.sentences.length}
         </span>
       </div>
+
+      {furthest >= 0 && (
+        <div className="flex items-center justify-between rounded-xl border border-line bg-panel px-4 py-2 text-xs text-muted">
+          <span>
+            {complete
+              ? "この物語を読み終えました — story complete"
+              : furthest + 1 < story.sentences.length
+                ? `Furthest read: sentence ${furthest + 1} of ${story.sentences.length}`
+                : "この物語を読み終えました — story complete"}
+          </span>
+          <button
+            onClick={reset}
+            className="text-muted underline decoration-dotted underline-offset-2 hover:text-foreground"
+          >
+            Reset progress
+          </button>
+        </div>
+      )}
 
       <div className="space-y-4">
         {story.sentences.map((s, i) => (
@@ -133,6 +213,8 @@ function StoryView({ story }: { story: Story }) {
               </span>
               <HoverText
                 tokens={s.tokens}
+                furigana={showFurigana}
+                romaji={showRomaji}
                 className="flex-1 font-jp text-xl leading-relaxed tracking-wide"
               />
               <SpeakButton text={s.jp} size="sm" label={`Listen to sentence ${i + 1}`} />
@@ -160,6 +242,7 @@ function StoryView({ story }: { story: Story }) {
 function ConversationView({ conversation }: { conversation: Conversation }) {
   const [ptr, setPtr] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
+  const [choices, setChoices] = useState<Record<number, number>>({});
   const [score, setScore] = useState(0);
   const reduce = useReducedMotion();
 
@@ -170,12 +253,14 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
   const restart = () => {
     setPtr(0);
     setSelected(null);
+    setChoices({});
     setScore(0);
   };
 
   const choose = (i: number) => {
     if (!current || selected !== null) return;
     setSelected(i);
+    setChoices((c) => ({ ...c, [ptr]: i }));
     if (current.options[i].correct) setScore((s) => s + 1);
   };
 
@@ -184,22 +269,94 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
     setPtr((p) => p + 1);
   };
 
+  const vocabEncountered = useMemo(() => {
+    const seen = new Map<string, Token>();
+    for (const t of conversation.turns) {
+      for (const tok of t.tokens) {
+        if (tok.meanings.length > 0 && !seen.has(tok.text)) seen.set(tok.text, tok);
+      }
+      for (const o of t.options) {
+        for (const tok of o.tokens) {
+          if (tok.meanings.length > 0 && !seen.has(tok.text)) seen.set(tok.text, tok);
+        }
+      }
+    }
+    return Array.from(seen.values()).slice(0, 24);
+  }, [conversation]);
+
   if (done) {
     const total = conversation.turns.filter((t) => t.options.length > 0).length;
     const pct = total === 0 ? 0 : Math.round((score / total) * 100);
+    const wrong = total - score;
+    const transcriptLines = conversation.turns.map((t, i) => {
+      const chosen = t.options.length > 0 ? (choices[i] ?? null) : null;
+      return {
+        speaker: t.speaker,
+        jp: chosen !== null ? t.options[chosen].jp : t.jp,
+        en: chosen !== null ? t.options[chosen].en : t.en,
+      };
+    });
+
     return (
-      <div className="mx-auto max-w-lg rounded-2xl border border-line bg-panel px-6 py-14 text-center">
-        <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-accent-soft">
-          <Trophy size={30} weight="duotone" className="text-accent" />
+      <div className="mx-auto max-w-xl space-y-6">
+        <div className="rounded-2xl border border-line bg-panel px-6 py-10 text-center">
+          <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-accent-soft">
+            <Trophy size={30} weight="duotone" className="text-accent" />
+          </div>
+          <div className="font-jp text-4xl font-bold">おつかれさま</div>
+          <div className="mt-4 text-3xl font-bold tabular-nums">{pct}%</div>
+          <p className="mt-2 text-sm text-muted">
+            {score} of {total} correct · {wrong} incorrect
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <SpeakButton text={transcriptLines.map((l) => l.jp)} label="Replay conversation" />
+            <Button onClick={restart}>Try again</Button>
+          </div>
         </div>
-        <div className="font-jp text-4xl font-bold">おつかれさま</div>
-        <div className="mt-4 text-3xl font-bold tabular-nums">{pct}%</div>
-        <p className="mt-2 text-sm text-muted">
-          You answered {score} of {total} choices correctly.
-        </p>
-        <Button className="mt-8" onClick={restart}>
-          Try again
-        </Button>
+
+        <div className="rounded-2xl border border-line bg-panel p-5">
+          <div className="mb-3 text-sm font-semibold">Vocabulary you met</div>
+          {vocabEncountered.length === 0 ? (
+            <p className="text-sm text-muted">No words with meanings in this conversation.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {vocabEncountered.map((t) => (
+                <span
+                  key={t.text}
+                  className="rounded-lg border border-line bg-panel-2 px-2.5 py-1 text-xs"
+                  title={`${t.reading} — ${t.meanings.join(" · ")}`}
+                >
+                  <span className="font-jp text-foreground">{t.text}</span>
+                  <span className="ml-1.5 text-muted">{t.meanings[0]}</span>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-line bg-panel p-5">
+          <div className="mb-3 text-sm font-semibold">Transcript</div>
+          <div className="space-y-2">
+            {transcriptLines.map((l, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span
+                  className={`mt-1 w-16 shrink-0 rounded-md px-2 py-0.5 text-center text-[10px] font-semibold ${
+                    l.speaker === "あなた"
+                      ? "bg-indigo/15 text-indigo"
+                      : "bg-accent-soft text-accent"
+                  }`}
+                >
+                  {l.speaker}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-jp text-sm leading-relaxed">{l.jp}</div>
+                  <div className="text-xs text-muted">{l.en}</div>
+                </div>
+                <SpeakButton text={l.jp} size="sm" label={`Listen to ${l.speaker}`} />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -264,7 +421,7 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
       </div>
 
       {isChoice && current && (
-        <div className="space-y-2">
+        <div className="space-y-2" role="group" aria-label="Choose your reply">
           {current.options.map((opt, i) => {
             let style =
               "border-line text-foreground hover:border-accent/60 hover:bg-accent-soft/40";
@@ -274,16 +431,26 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
               else style = "border-line text-muted opacity-60";
             }
             return (
-              <button
+              <div
                 key={i}
+                role="button"
+                tabIndex={selected !== null ? -1 : 0}
+                aria-disabled={selected !== null}
                 onClick={() => choose(i)}
-                disabled={selected !== null}
-                className={`press flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors disabled:cursor-default ${style}`}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    choose(i);
+                  }
+                }}
+                className={`press flex w-full cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
+                  selected !== null ? "cursor-default" : ""
+                } ${style}`}
               >
                 <span className="text-xs text-muted">{i + 1}.</span>
                 <HoverText tokens={opt.tokens} className="font-jp text-base" />
                 <span className="ml-auto hidden text-xs text-muted sm:block">{opt.en}</span>
-              </button>
+              </div>
             );
           })}
 
@@ -293,30 +460,45 @@ function ConversationView({ conversation }: { conversation: Conversation }) {
                 initial={reduce ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="flex items-center justify-between gap-3 rounded-xl border border-line bg-panel-2 px-4 py-3"
+                className="rounded-xl border border-line bg-panel-2 px-4 py-3"
                 aria-live="polite"
               >
-                <span className="flex items-center gap-2 text-sm">
-                  {current.options[selected].correct ? (
-                    <>
-                      <CheckCircle size={16} weight="bold" className="shrink-0 text-good" />
-                      <span className="text-good">Correct!</span>
-                    </>
-                  ) : (
-                    <>
-                      <XCircle size={16} weight="bold" className="shrink-0 text-red-400" />
-                      <span className="text-red-400">
-                        Not quite — the natural reply is{" "}
-                        <span className="font-jp text-foreground">
-                          {current.options.find((o) => o.correct)?.jp}
+                {(() => {
+                  const pickedOpt = current.options[selected];
+                  const natural = current.options.find((o) => o.correct)!;
+                  if (pickedOpt.correct) {
+                    return (
+                      <div>
+                        <span className="flex items-center gap-2 text-sm">
+                          <CheckCircle size={16} weight="bold" className="shrink-0 text-good" />
+                          <span className="text-good">Correct!</span>
+                        </span>
+                        {natural.why && (
+                          <p className="mt-1.5 text-xs leading-relaxed text-muted">{natural.why}</p>
+                        )}
+                      </div>
+                    );
+                  }
+                  return (
+                    <div>
+                      <span className="flex items-center gap-2 text-sm">
+                        <XCircle size={16} weight="bold" className="shrink-0 text-red-400" />
+                        <span className="text-red-400">
+                          Not quite — the natural reply is{" "}
+                          <span className="font-jp text-foreground">{natural.jp}</span>
                         </span>
                       </span>
-                    </>
-                  )}
-                </span>
-                <Button size="sm" onClick={next}>
-                  Continue
-                </Button>
+                      {pickedOpt.why && (
+                        <p className="mt-1.5 text-xs leading-relaxed text-muted">{pickedOpt.why}</p>
+                      )}
+                    </div>
+                  );
+                })()}
+                <div className="mt-3 flex justify-end">
+                  <Button size="sm" onClick={next}>
+                    Continue
+                  </Button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

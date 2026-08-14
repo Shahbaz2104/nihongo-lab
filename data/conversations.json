@@ -16,9 +16,21 @@
         "en": "",
         "correct": 0,
         "options": [
-          { "jp": "コーヒーをください。", "en": "Coffee, please." },
-          { "jp": "おはようございます。", "en": "Good morning." },
-          { "jp": "いただきます。", "en": "Thank you for the meal (before eating)." }
+          {
+            "jp": "コーヒーをください。",
+            "en": "Coffee, please.",
+            "why": "The clerk asked what you would like (何にしますか). Ordering with ください — “please give me” — is the natural reply."
+          },
+          {
+            "jp": "おはようございます。",
+            "en": "Good morning.",
+            "why": "It is daytime and you were just asked for an order, not greeted. A morning greeting does not answer the question."
+          },
+          {
+            "jp": "いただきます。",
+            "en": "Thank you for the meal (before eating).",
+            "why": "いただきます is said before eating a meal, not when placing an order."
+          }
         ]
       },
       {
@@ -32,9 +44,21 @@
         "en": "",
         "correct": 1,
         "options": [
-          { "jp": "ごちそうさまでした。", "en": "Thanks for the meal (after eating)." },
-          { "jp": "はい、お願いします。", "en": "Yes, please." },
-          { "jp": "こんばんは。", "en": "Good evening." }
+          {
+            "jp": "ごちそうさまでした。",
+            "en": "Thanks for the meal (after eating).",
+            "why": "ごちそうさまでした is said after finishing a meal, not when confirming an order."
+          },
+          {
+            "jp": "はい、お願いします。",
+            "en": "Yes, please.",
+            "why": "The clerk is confirming that coffee is okay. はい、お願いします politely confirms."
+          },
+          {
+            "jp": "こんばんは。",
+            "en": "Good evening.",
+            "why": "こんばんは is an evening greeting — you are being asked to confirm your order."
+          }
         ]
       },
       {
@@ -48,9 +72,21 @@
         "en": "",
         "correct": 2,
         "options": [
-          { "jp": "お会計をお願いします。", "en": "The check, please." },
-          { "jp": "お元気ですか。", "en": "How are you?" },
-          { "jp": "ホットでお願いします。", "en": "Hot, please." }
+          {
+            "jp": "お会計をお願いします。",
+            "en": "The check, please.",
+            "why": "お会計 would be for when you are leaving, not before choosing hot or iced."
+          },
+          {
+            "jp": "お元気ですか。",
+            "en": "How are you?",
+            "why": "お元気ですか is a “how are you?” — the clerk asked which one you want."
+          },
+          {
+            "jp": "ホットでお願いします。",
+            "en": "Hot, please.",
+            "why": "Choosing hot and adding お願いします politely answers どちらにしますか — “which would you like?”."
+          }
         ]
       },
       {
@@ -64,9 +100,21 @@
         "en": "",
         "correct": 0,
         "options": [
-          { "jp": "ありがとうございます。", "en": "Thank you." },
-          { "jp": "すみません。", "en": "Excuse me / sorry." },
-          { "jp": "いただきます。", "en": "Let me eat." }
+          {
+            "jp": "ありがとうございます。",
+            "en": "Thank you.",
+            "why": "The clerk handed you the coffee (どうぞ). Thanking with ありがとうございます is the natural reply."
+          },
+          {
+            "jp": "すみません。",
+            "en": "Excuse me / sorry.",
+            "why": "すみません means “excuse me / sorry” — it is not needed when receiving something."
+          },
+          {
+            "jp": "いただきます。",
+            "en": "Let me eat.",
+            "why": "いただきます is said before eating, not when receiving a drink you just ordered."
+          }
         ]
       },
       {
@@ -93,9 +141,21 @@
         "en": "",
         "correct": 2,
         "options": [
-          { "jp": "さようなら。", "en": "Goodbye." },
-          { "jp": "いただきます。", "en": "Let me eat." },
-          { "jp": "はじめまして、私はサラです。", "en": "Nice to meet you, I'm Sara." }
+          {
+            "jp": "さようなら。",
+            "en": "Goodbye.",
+            "why": "さようなら is for leaving — you have just met."
+          },
+          {
+            "jp": "いただきます。",
+            "en": "Let me eat.",
+            "why": "いただきます is a meal phrase, not part of a self-introduction."
+          },
+          {
+            "jp": "はじめまして、私はサラです。",
+            "en": "Nice to meet you, I'm Sara.",
+            "why": "Mirroring はじめまして and introducing yourself by name is the natural reply."
+          }
         ]
       },
       {
@@ -109,9 +169,21 @@
         "en": "",
         "correct": 0,
         "options": [
-          { "jp": "アメリカから来ました。", "en": "I came from America." },
-          { "jp": "これは本です。", "en": "This is a book." },
-          { "jp": "おやすみなさい。", "en": "Good night." }
+          {
+            "jp": "アメリカから来ました。",
+            "en": "I came from America.",
+            "why": "Answering where you are from directly answers お国はどちらですか — “where are you from?”."
+          },
+          {
+            "jp": "これは本です。",
+            "en": "This is a book.",
+            "why": "これは本です is unrelated — the question is about your country."
+          },
+          {
+            "jp": "おやすみなさい。",
+            "en": "Good night.",
+            "why": "おやすみなさい means “good night”; it does not answer the question."
+          }
         ]
       },
       {
@@ -125,9 +197,21 @@
         "en": "",
         "correct": 1,
         "options": [
-          { "jp": "はい、わかりました。", "en": "Yes, I understand." },
-          { "jp": "いいえ、まだ下手です。", "en": "No, I'm still not good at it." },
-          { "jp": "ごめんなさい。", "en": "I'm sorry." }
+          {
+            "jp": "はい、わかりました。",
+            "en": "Yes, I understand.",
+            "why": "はい、わかりました means “yes, I understand” — it is not a reply to a compliment about your Japanese."
+          },
+          {
+            "jp": "いいえ、まだ下手です。",
+            "en": "No, I'm still not good at it.",
+            "why": "Humbly deflecting the compliment (いいえ、まだ下手です — “no, I am still bad”) is the natural Japanese response."
+          },
+          {
+            "jp": "ごめんなさい。",
+            "en": "I'm sorry.",
+            "why": "ごめんなさい is an apology; nothing to apologize for here."
+          }
         ]
       },
       {
@@ -141,9 +225,21 @@
         "en": "",
         "correct": 2,
         "options": [
-          { "jp": "おはようございます。", "en": "Good morning." },
-          { "jp": "どういたしまして。", "en": "You're welcome." },
-          { "jp": "はい、また会いましょう。", "en": "Yes, let's meet again." }
+          {
+            "jp": "おはようございます。",
+            "en": "Good morning.",
+            "why": "おはようございます is a morning greeting — you are agreeing to meet again."
+          },
+          {
+            "jp": "どういたしまして。",
+            "en": "You're welcome.",
+            "why": "どういたしまして (“you are welcome”) is said after thanks, not here."
+          },
+          {
+            "jp": "はい、また会いましょう。",
+            "en": "Yes, let's meet again.",
+            "why": "Agreeing by repeating また会いましょう — “yes, let’s meet again” — is the natural reply."
+          }
         ]
       }
     ]
