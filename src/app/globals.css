@@ -88,7 +88,6 @@
   --primary-foreground: #ffffff;
   --secondary: var(--panel-2);
   --secondary-foreground: var(--foreground);
-  --muted: var(--panel-2);
   --muted-foreground: var(--muted);
   --accent-foreground: #ffffff;
   --destructive: var(--bad);
