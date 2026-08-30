@@ -47,7 +47,7 @@ export function VocabBrowser({ levels }: { levels: Record<string, Row[]> }) {
             setVisible(PAGE_SIZE);
           }}
         />
-        <div className="relative">
+        <div className="relative w-full sm:w-64">
           <MagnifyingGlass
             size={14}
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
@@ -59,7 +59,7 @@ export function VocabBrowser({ levels }: { levels: Record<string, Row[]> }) {
               setVisible(PAGE_SIZE);
             }}
             placeholder="Search word, meaning…"
-            className="w-64 rounded-xl border border-line bg-panel py-2 pl-8 pr-3 text-sm outline-none placeholder:text-muted/60 focus:border-accent"
+            className="w-full rounded-xl border border-line bg-panel py-2 pl-8 pr-3 text-sm outline-none placeholder:text-muted/60 focus:border-accent"
           />
         </div>
         <span className="text-xs tabular-nums text-muted">
@@ -80,13 +80,13 @@ export function VocabBrowser({ levels }: { levels: Record<string, Row[]> }) {
             const phrase = v.examples[0];
             return (
               <div key={v.word} className="px-4 py-3 transition-colors hover:bg-panel-2/40">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <SpeakButton
                     text={v.reading || word}
                     size="sm"
                     label={`Listen to ${word}`}
                   />
-                  <div className="w-40 shrink-0">
+                  <div className="min-w-24 shrink-0 sm:w-40">
                     <div className="font-jp text-lg leading-tight">
                       <Furigana word={word} reading={v.reading} />
                     </div>
@@ -95,13 +95,13 @@ export function VocabBrowser({ levels }: { levels: Record<string, Row[]> }) {
                   <div className="min-w-0 flex-1 text-sm">{v.meanings.join("; ")}</div>
                 </div>
                 {phrase && (
-                  <div className="ml-12 mt-2 flex items-start gap-2 rounded-xl bg-panel-2 px-3 py-2">
+                  <div className="mt-2 flex items-start gap-2 rounded-xl bg-panel-2 px-3 py-2">
                     <SpeakButton text={phrase.ja} size="sm" label="Listen to example" />
                     <div className="min-w-0">
                       <div className="font-jp text-sm">
                         <RubyText tokens={phrase.tokens} />
                       </div>
-                      <div className="mt-0.5 text-[11px] text-muted italic">{phrase.romaji}</div>
+                      <div className="mt-0.5 text-xs text-muted italic">{phrase.romaji}</div>
                       <div className="mt-0.5 text-xs text-muted">{phrase.en}</div>
                     </div>
                   </div>

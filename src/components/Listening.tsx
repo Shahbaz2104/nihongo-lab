@@ -202,6 +202,7 @@ export function Listening() {
                   >
                     <span className="mr-2 text-xs text-muted">{String.fromCharCode(65 + i)}.</span>
                     {o}
+                    <kbd className="kbd ml-1.5">{i + 1}</kbd>
                   </button>
                 );
               })}
@@ -232,7 +233,7 @@ export function Listening() {
                     <div className="mt-4 rounded-xl bg-panel-2 px-4 py-3">
                       <HoverText tokens={q.tokens} className="font-jp text-lg leading-relaxed" />
                       {q.en && <div className="mt-1 text-sm text-muted">{q.en}</div>}
-                      <p className="mt-2 text-xs text-muted">Hover any word for its meaning — add it to your reviews.</p>
+                      <p className="mt-2 text-xs text-muted">Tap or hover any word for its meaning — add it to your reviews.</p>
                     </div>
                     <Button className="mt-4" onClick={next}>
                       {index + 1 >= questions.length ? "See results" : "Next"}

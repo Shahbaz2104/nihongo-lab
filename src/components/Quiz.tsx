@@ -10,6 +10,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 
 const types = [
   { id: "vocab", label: "Vocab", speak: true },
@@ -238,14 +239,23 @@ export function Quiz({ initialType = "vocab", initialLevel = "N5", onComplete }:
             animate={{ opacity: 1, x: 0 }}
             className="rounded-2xl border border-line bg-panel py-10 text-center"
           >
-            <button
-              onClick={() => speakEnabled && speakJapanese(q.prompt)}
-              className={`font-jp text-5xl font-bold ${
-                speakEnabled ? "transition-transform hover:scale-105" : ""
-              }`}
-            >
-              {q.prompt}
-            </button>
+            <div className="flex flex-col items-center gap-3">
+              <button
+                onClick={() => speakEnabled && speakJapanese(q.prompt)}
+                className={`font-jp text-5xl font-bold ${
+                  speakEnabled ? "transition-transform hover:scale-105" : ""
+                }`}
+              >
+                {q.prompt}
+              </button>
+              {speakEnabled && (
+                <SpeakButton
+                  text={q.prompt}
+                  size="sm"
+                  label="Listen to prompt"
+                />
+              )}
+            </div>
             {q.alt && <div className="mt-2 text-sm text-muted">{q.alt}</div>}
             <div className="mt-2 text-xs text-muted">{subtitles[direction]}</div>
 

@@ -129,10 +129,10 @@ export function StatsDashboard({ stories }: { stories: { id: string; sentences: 
             <CartesianGrid stroke="var(--color-line)" strokeDasharray="3 3" vertical={false} />
             <XAxis
               dataKey="date"
-              tick={{ fill: "var(--color-muted)", fontSize: 10 }}
+              tick={{ fill: "var(--color-muted)", fontSize: 11 }}
               tickFormatter={(d: string) => d.slice(5)}
             />
-            <YAxis tick={{ fill: "var(--color-muted)", fontSize: 10 }} allowDecimals={false} width={30} />
+            <YAxis tick={{ fill: "var(--color-muted)", fontSize: 11 }} allowDecimals={false} width={30} />
             <Tooltip
               cursor={{ fill: "rgba(216,72,44,0.08)" }}
               contentStyle={{

@@ -17,6 +17,23 @@ export default function ReviewPage() {
   const [type, setType] = useState("vocab");
   const [level, setLevel] = useState("N5");
   const [session, setSession] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  const changeType = (id: string) => {
+    if (id === type) return;
+    if (started && !window.confirm("Change type? This resets your current review session.")) return;
+    setType(id);
+    setStarted(false);
+    setSession((s) => s + 1);
+  };
+
+  const changeLevel = (l: string) => {
+    if (l === level) return;
+    if (started && !window.confirm("Change level? This resets your current review session.")) return;
+    setLevel(l);
+    setStarted(false);
+    setSession((s) => s + 1);
+  };
 
   return (
     <div className="space-y-6">
@@ -29,17 +46,11 @@ export default function ReviewPage() {
         <SegmentedControl
           options={types}
           value={type}
-          onChange={(id) => {
-            setType(id);
-            setSession((s) => s + 1);
-          }}
+          onChange={changeType}
         />
         <LevelSelector
           value={level}
-          onChange={(l) => {
-            setLevel(l);
-            setSession((s) => s + 1);
-          }}
+          onChange={changeLevel}
         />
         <Button variant="secondary" size="sm" onClick={() => setSession((s) => s + 1)}>
           New session
@@ -50,7 +61,13 @@ export default function ReviewPage() {
         key={`${type}-${level}-${session}`}
         type={type}
         level={level}
-        onRestart={() => setSession((s) => s + 1)}
+        onProgress={(n) => {
+          if (n > 0) setStarted(true);
+        }}
+        onRestart={() => {
+          setStarted(false);
+          setSession((s) => s + 1);
+        }}
       />
     </div>
   );

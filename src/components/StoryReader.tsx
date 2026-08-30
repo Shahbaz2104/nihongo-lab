@@ -227,7 +227,7 @@ function StoryView({ story }: { story: Story }) {
       </div>
 
       <p className="text-xs text-muted/70">
-        Tip: hover or tap any word to see its reading, romaji, and meaning.
+        Tip: tap or hover any word to see its reading, romaji, and meaning.
       </p>
     </div>
   );

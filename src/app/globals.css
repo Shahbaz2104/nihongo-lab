@@ -187,11 +187,11 @@ ruby.ruby-word {
 }
 
 ruby.ruby-word rt {
-  font-size: 0.5em;
+  font-size: 0.55em;
   font-weight: 500;
-  color: #93856a;
+  color: #b6aa8e;
   letter-spacing: 0;
-  opacity: 0.9;
+  opacity: 1;
 }
 
 /* Hanko seal — vermillion stamp look */
@@ -219,7 +219,7 @@ ruby.ruby-word rt {
 }
 
 .animate-rise {
-  animation: rise 0.35s ease-out both;
+  animation: rise 0.35s ease-out backwards;
 }
 
 /* Respect reduced-motion preferences globally */

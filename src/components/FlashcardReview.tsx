@@ -18,6 +18,7 @@ interface Props {
   limit?: number;
   onRestart?: () => void;
   onComplete?: () => void;
+  onProgress?: (reviewed: number) => void;
 }
 
 const gradeOrder: Grade[] = ["again", "hard", "good", "easy"];
@@ -39,7 +40,7 @@ const gradeLabels: Record<Grade, { jp: string; en: string }> = {
   easy: { jp: "簡単", en: "Easy" },
 };
 
-export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete }: Props) {
+export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete, onProgress }: Props) {
   const [queue, setQueue] = useState<ReviewCard[]>([]);
   const [revealed, setRevealed] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -87,6 +88,7 @@ export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete
       try {
         await api.review(card.id, g);
         setSession((s) => ({ reviewed: s.reviewed + 1, correct: s.correct + (g !== "again" ? 1 : 0) }));
+        onProgress?.(session.reviewed + 1);
         setQueue((q) => {
           const remaining = q.filter((c) => c.id !== card.id);
           if (g !== "again") return remaining;
@@ -106,7 +108,7 @@ export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete
         setSubmitting(false);
       }
     },
-    [card, queue.length, submitting],
+    [card, queue.length, submitting, onProgress, session.reviewed],
   );
 
   useEffect(() => {

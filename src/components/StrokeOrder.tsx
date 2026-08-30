@@ -123,7 +123,7 @@ export function StrokeOrder({ character }: { character: string }) {
         </div>
       )}
       {!reduce && (
-        <div className="text-[10px] tabular-nums text-muted">
+        <div className="text-[11px] tabular-nums text-muted">
           {progress} / {paths.length} strokes
         </div>
       )}

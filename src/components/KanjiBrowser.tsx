@@ -9,6 +9,7 @@ import { KanjiDraw } from "@/components/KanjiDraw";
 import { Modal } from "@/components/ui/Modal";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 
 export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }) {
   const [selected, setSelected] = useState<KanjiItem | null>(null);
@@ -69,7 +70,7 @@ export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }
             setSelected(null);
           }}
         />
-        <div className="relative">
+        <div className="relative w-full sm:w-64">
           <MagnifyingGlass
             size={14}
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
@@ -78,7 +79,7 @@ export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search kanji, meaning, reading…"
-            className="w-64 rounded-xl border border-line bg-panel py-2 pl-8 pr-3 text-sm outline-none placeholder:text-muted/60 focus:border-accent"
+            className="w-full rounded-xl border border-line bg-panel py-2 pl-8 pr-3 text-sm outline-none placeholder:text-muted/60 focus:border-accent"
           />
         </div>
         <span className="text-xs tabular-nums text-muted">{filtered.length.toLocaleString()} kanji</span>
@@ -91,15 +92,15 @@ export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }
           body="Try a different reading, meaning, or the kanji itself."
         />
       ) : (
-        <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10">
+        <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-10">
           {filtered.map((k) => (
             <button
               key={k.character}
               onClick={() => setSelected(k)}
-              className="group flex flex-col items-center rounded-xl border border-line bg-panel py-3 transition-colors hover:border-accent"
+              className="group flex min-h-16 flex-col items-center justify-center rounded-xl border border-line bg-panel px-1 py-2.5 transition-colors hover:border-accent"
             >
-              <span className="font-jp text-3xl text-foreground group-hover:text-accent">{k.character}</span>
-              <span className="mt-1 max-w-full truncate px-1 text-[10px] text-muted">
+              <span className="font-jp text-2xl text-foreground group-hover:text-accent sm:text-3xl">{k.character}</span>
+              <span className="mt-1 line-clamp-2 w-full px-1 text-center text-[11px] leading-tight text-muted">
                 {k.meanings[0]}
               </span>
             </button>
@@ -117,14 +118,17 @@ export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }
           <div className="p-6">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-4">
-                <button
-                  onClick={() => speakJapanese(selected.character)}
-                  className="font-jp text-6xl text-accent transition-transform hover:scale-105"
-                  aria-label={`Listen to ${selected.character}`}
-                  title="Listen"
-                >
-                  {selected.character}
-                </button>
+                <div className="flex flex-col items-center gap-2">
+                  <button
+                    onClick={() => speakJapanese(selected.character)}
+                    className="font-jp text-6xl text-accent transition-transform hover:scale-105"
+                    aria-label={`Listen to ${selected.character}`}
+                    title="Listen"
+                  >
+                    {selected.character}
+                  </button>
+                  <SpeakButton text={selected.character} size="sm" label={`Listen to ${selected.character}`} />
+                </div>
                 <div>
                   <div className="text-sm text-muted">
                     {selected.level} · {selected.strokes} strokes · grade {selected.grade}
@@ -134,10 +138,10 @@ export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }
               </div>
               <button
                 onClick={() => setSelected(null)}
-                className="press grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-line text-muted transition-colors hover:text-foreground"
+                className="press grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line text-muted transition-colors hover:text-foreground"
                 aria-label="Close"
               >
-                <X size={14} />
+                <X size={16} />
               </button>
             </div>
 
@@ -175,7 +179,7 @@ export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }
               <button
                 onClick={() => step(-1)}
                 disabled={selectedIdx <= 0}
-                className="press flex h-9 items-center gap-1.5 rounded-xl px-3 text-xs font-medium text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                className="press flex h-10 items-center gap-1.5 rounded-xl px-3 text-xs font-medium text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <CaretLeft size={14} />
                 Previous
@@ -186,7 +190,7 @@ export function KanjiBrowser({ levels }: { levels: Record<string, KanjiItem[]> }
               <button
                 onClick={() => step(1)}
                 disabled={selectedIdx < 0 || selectedIdx >= filtered.length - 1}
-                className="press flex h-9 items-center gap-1.5 rounded-xl px-3 text-xs font-medium text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                className="press flex h-10 items-center gap-1.5 rounded-xl px-3 text-xs font-medium text-muted transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
                 <CaretRight size={14} />

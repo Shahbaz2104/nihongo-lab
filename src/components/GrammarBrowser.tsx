@@ -76,7 +76,7 @@ export function GrammarBrowser({ levels }: { levels: Record<string, Row[]> }) {
                         <div className="font-jp text-base">
                           <RubyText tokens={ex.tokens} />
                         </div>
-                        <div className="mt-0.5 text-[11px] text-muted italic">{ex.romaji}</div>
+                        <div className="mt-0.5 text-xs text-muted italic">{ex.romaji}</div>
                         <div className="mt-0.5 text-xs text-muted">{ex.en}</div>
                       </div>
                     </div>

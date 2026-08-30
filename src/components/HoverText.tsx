@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plus } from "@phosphor-icons/react";
 import type { Token } from "@/lib/tokenizer";
 import { Furigana } from "@/components/Furigana";
@@ -19,6 +19,18 @@ export function HoverText({
 }) {
   const [open, setOpen] = useState<number | null>(null);
   const [saved, setSaved] = useState<number | null>(null);
+  const rootRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (open === null) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) {
+        setOpen(null);
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
 
   const addToReview = async (t: Token, i: number) => {
     try {
@@ -36,7 +48,7 @@ export function HoverText({
   };
 
   return (
-    <span className={className}>
+    <span ref={rootRef} className={className}>
       {tokens.map((t, i) => {
         const hint = t.reading && t.meanings.length > 0;
         if (!hint) return <span key={i}>{t.text}</span>;
@@ -59,12 +71,12 @@ export function HoverText({
                 e.stopPropagation();
                 setOpen(isOpen ? null : i);
               }}
-              onFocus={() => setOpen(i)}
               onBlur={(e) => {
-                if (!e.currentTarget.nextElementSibling?.contains(e.relatedTarget as Node)) {
-                  setOpen((cur) => (cur === i ? null : cur));
-                }
-              }}
+              const related = e.relatedTarget as Node | null;
+              if (related && !e.currentTarget.nextElementSibling?.contains(related)) {
+                setOpen((cur) => (cur === i ? null : cur));
+              }
+            }}
               onKeyDown={(e) => {
                 if (e.key === "Escape") {
                   e.preventDefault();
@@ -81,7 +93,7 @@ export function HoverText({
             </button>
             <span
               role="tooltip"
-              className={`absolute top-full z-30 mt-2 w-max max-w-[min(16rem,72vw)] whitespace-normal rounded-xl border border-line bg-panel-2/95 px-3 py-2 text-left shadow-2xl shadow-black/60 backdrop-blur-sm ${align} ${
+              className={`absolute top-full z-[45] mt-2 w-max max-w-[min(18rem,80vw)] whitespace-normal rounded-xl border border-line border-t-accent/70 bg-elevated/95 px-3.5 py-2.5 text-left shadow-2xl shadow-black/60 backdrop-blur-sm ${align} ${
                 isOpen ? "block" : "hidden group-hover/word:block"
               }`}
             >
@@ -89,10 +101,10 @@ export function HoverText({
                 <span className="font-jp text-sm font-bold text-accent">{t.text}</span>
                 <span className="font-jp text-foreground/90">{t.reading}</span>
                 {romaji && (
-                  <span className="text-[10px] uppercase tracking-wider text-indigo">{t.romaji}</span>
+                  <span className="text-[11px] uppercase tracking-wider text-indigo">{t.romaji}</span>
                 )}
               </span>
-              <span className="block text-xs leading-snug text-muted">
+              <span className="block max-w-[min(18rem,80vw)] text-sm leading-snug text-foreground/95">
                 {t.meanings.slice(0, 3).join(" · ")}
               </span>
               <button
@@ -102,15 +114,15 @@ export function HoverText({
                   addToReview(t, i);
                 }}
                 disabled={saved === i || saved === -1}
-                className={`mt-2 flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-semibold transition-colors ${
+                className={`mt-2 flex min-h-10 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold transition-colors ${
                   saved === i
                     ? "border-good/40 bg-good/10 text-good"
                     : saved === -1
                       ? "cursor-not-allowed border-red-500/40 text-bad"
-                      : "border-line bg-panel text-muted hover:border-accent hover:text-foreground"
+                      : "border-line bg-panel text-foreground hover:border-accent"
                 }`}
               >
-                <Plus size={10} weight="bold" />
+                <Plus size={14} weight="bold" />
                 {saved === i ? "Added to review" : saved === -1 ? "Failed" : "Add to review"}
               </button>
             </span>

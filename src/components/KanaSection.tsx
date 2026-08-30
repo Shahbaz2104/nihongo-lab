@@ -7,6 +7,7 @@ import { speakJapanese } from "@/lib/tts";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Button } from "@/components/ui/Button";
+import { SpeakButton } from "@/components/ui/SpeakButton";
 
 type Mode = "chart" | "drill";
 
@@ -157,14 +158,17 @@ export function KanaSection({ kana }: { kana: KanaItem[] }) {
               className="rounded-2xl border border-line bg-panel py-12 text-center"
             >
               <div className="mb-2 text-xs text-muted">What romaji is this?</div>
-              <button
-                onClick={() => speakJapanese(current.char)}
-                className="font-jp text-7xl text-foreground transition-transform hover:scale-105"
-                aria-label="Listen"
-                title="Listen"
-              >
-                {current.char}
-              </button>
+              <div className="flex flex-col items-center gap-3">
+                <button
+                  onClick={() => speakJapanese(current.char)}
+                  className="font-jp text-7xl text-foreground transition-transform hover:scale-105"
+                  aria-label="Listen"
+                  title="Listen"
+                >
+                  {current.char}
+                </button>
+                <SpeakButton text={current.char} size="sm" label="Listen to kana" />
+              </div>
 
               <div className="mt-8 grid grid-cols-2 gap-2 px-6" role="group" aria-label="Options">
                 {options.map((o, i) => {

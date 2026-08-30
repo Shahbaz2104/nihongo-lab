@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Cards, ChartBar, CheckCircle, ChatCircleDots, BookOpen, Plus, Quotes, Trophy } from "@phosphor-icons/react";
+import { ArrowRight, Cards, ChartBar, CheckCircle, ChatCircleDots, BookOpen, Plus, Quotes, Trophy, XCircle } from "@phosphor-icons/react";
 import { api, type NewWord } from "@/lib/api";
 import { FlashcardReview } from "@/components/FlashcardReview";
 import { Quiz } from "@/components/Quiz";
@@ -105,7 +105,7 @@ export function Session({ stories, conversations }: Props) {
       {step === 0 && (
         <FlashcardReview type="vocab" level={level} limit={10} onComplete={() => setStep(1)} onRestart={() => setStep(1)} />
       )}
-      {step === 1 && <NewWordsStep level={level} onDone={() => setStep(2)} />}
+      {step === 1 && <NewWordsStep key={level} level={level} onDone={() => setStep(2)} />}
       {step === 2 && (
         <>
           <StoryReader stories={stories} conversations={conversations} initialTab="reading" />
@@ -135,6 +135,8 @@ export function Session({ stories, conversations }: Props) {
 
 function NewWordsStep({ level, onDone }: { level: string; onDone: () => void }) {
   const [words, setWords] = useState<NewWord[] | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const [idx, setIdx] = useState(0);
   const [added, setAdded] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -144,20 +146,46 @@ function NewWordsStep({ level, onDone }: { level: string; onDone: () => void }) 
     api
       .sessionNewWords(level, 5)
       .then(({ words }) => {
-        if (alive) setWords(words);
+        if (alive) {
+          setFailed(false);
+          setWords(words);
+        }
       })
       .catch(() => {
-        if (alive) setWords([]);
+        if (alive) {
+          setFailed(true);
+          setWords([]);
+        }
       });
     return () => {
       alive = false;
     };
-  }, [level]);
+  }, [level, retryKey]);
 
   if (words === null) {
     return (
       <div className="mx-auto max-w-lg space-y-3">
         <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
+  if (failed) {
+    return (
+      <div className="mx-auto max-w-md rounded-2xl border border-line bg-panel px-6 py-12 text-center">
+        <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-bad/10">
+          <XCircle size={30} weight="duotone" className="text-bad" />
+        </div>
+        <div className="text-xl font-bold">Couldn&apos;t load new words</div>
+        <p className="mt-3 text-sm text-muted">
+          Something went wrong fetching today&apos;s vocabulary. Check your connection and try again.
+        </p>
+        <Button className="mt-8" onClick={() => {
+          setWords(null);
+          setRetryKey((k) => k + 1);
+        }}>
+          Try again
+        </Button>
       </div>
     );
   }

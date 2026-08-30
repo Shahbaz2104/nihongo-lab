@@ -115,7 +115,7 @@ export function Overview() {
         >
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-display text-xl font-bold text-foreground">今日の日本語</span>
-            <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+            <span className="rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
               Session
             </span>
           </div>
@@ -139,7 +139,7 @@ export function Overview() {
               <div className="font-display text-xl font-bold text-foreground">
                 {stats ? `${stats.todayReviews}/${stats.dueCards}` : "—"}
               </div>
-              <div className="mt-1 text-[11px] text-muted">復習 today</div>
+              <div className="mt-1 text-xs text-muted">復習 today</div>
             </div>
           </EnsoRing>
           <div className="mt-3 text-xs text-muted">
@@ -216,12 +216,12 @@ export function Overview() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-foreground">{m.label}</span>
-                      <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                      <span className="rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
                         Reading
                       </span>
                     </div>
                     <div className="text-sm text-muted">
-                      Word-by-word furigana, hover tooltips, and conversation practice.
+                      Word-by-word furigana, tap-any-word tooltips, and conversation practice.
                     </div>
                   </div>
                   <ArrowRight size={18} className="shrink-0 text-muted transition-all group-hover:translate-x-1 group-hover:text-accent" />
@@ -286,7 +286,7 @@ function StatCard({
 function PlanRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl bg-panel-2/60 px-3 py-2">
-      <dt className="text-[11px] text-muted">{label}</dt>
+      <dt className="text-xs text-muted">{label}</dt>
       <dd className="text-lg font-bold tabular-nums text-foreground">{value}</dd>
     </div>
   );
