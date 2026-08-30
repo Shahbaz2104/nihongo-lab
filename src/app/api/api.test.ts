@@ -112,6 +112,18 @@ describe("GET /api/quiz — validation", () => {
       }
     }
   });
+
+  it("normalizes dotted kunyomi in kanji-to-reading options", async () => {
+    const res = await quizGet(get("http://localhost/api/quiz?type=kanji&level=N5&n=8&seed=3&direction=kr"));
+    expect(res.status).toBe(200);
+    const { questions } = await res.json();
+    for (const q of questions) {
+      expect(q.answer).not.toMatch(/[・.]/);
+      for (const o of q.options) {
+        expect(o).not.toMatch(/[・.]/);
+      }
+    }
+  });
 });
 
 describe("GET /api/listening — validation and generation", () => {

@@ -175,38 +175,41 @@ export async function submitReview(cardId: string, grade: Grade) {
   );
 
   const now = new Date();
-  await db.card.update({
-    where: { id: cardId },
-    data: {
-      status: result.state.status,
-      ease: result.state.ease,
-      interval: result.state.interval,
-      reps: result.state.reps,
-      lapses: result.state.lapses,
-      due: result.state.due,
-      lastReviewAt: now,
-    },
-  });
-
-  await db.reviewLog.create({
-    data: {
-      cardId,
-      grade: result.q,
-      interval: result.state.interval,
-      ease: result.state.ease,
-      reviewedAt: now,
-    },
-  });
-
-  const date = dayKey(now);
-  await db.dayStat.upsert({
-    where: { date },
-    create: { date, reviews: 1, learned: result.correct && card.status === 0 ? 1 : 0 },
-    update: {
-      reviews: { increment: 1 },
-      ...(result.correct && card.status === 0 ? { learned: { increment: 1 } } : {}),
-    },
-  });
+  await db.$transaction([
+    db.card.update({
+      where: { id: cardId },
+      data: {
+        status: result.state.status,
+        ease: result.state.ease,
+        interval: result.state.interval,
+        reps: result.state.reps,
+        lapses: result.state.lapses,
+        due: result.state.due,
+        lastReviewAt: now,
+      },
+    }),
+    db.reviewLog.create({
+      data: {
+        cardId,
+        grade: result.q,
+        interval: result.state.interval,
+        ease: result.state.ease,
+        reviewedAt: now,
+      },
+    }),
+    db.dayStat.upsert({
+      where: { date: dayKey(now) },
+      create: {
+        date: dayKey(now),
+        reviews: 1,
+        learned: result.correct && card.status === 0 ? 1 : 0,
+      },
+      update: {
+        reviews: { increment: 1 },
+        ...(result.correct && card.status === 0 ? { learned: { increment: 1 } } : {}),
+      },
+    }),
+  ]);
 
   return { nextInterval: result.state.interval, nextDue: result.state.due };
 }

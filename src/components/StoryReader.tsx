@@ -520,51 +520,73 @@ export function StoryReader({ stories, conversations, initialTab = "reading" }: 
 
       {tab === "reading" && (
         <div className="space-y-6">
-          <div className="flex flex-wrap gap-2">
-            {stories.map((s, i) => (
-              <button
-                key={s.id}
-                onClick={() => setStoryIdx(i)}
-                className={`press rounded-xl border px-4 py-2 text-left transition-colors ${
-                  storyIdx === i
-                    ? "border-accent bg-accent-soft text-foreground"
-                    : "border-line bg-panel text-muted hover:border-accent/50 hover:text-foreground"
-                }`}
-              >
-                <span className="font-jp text-sm">{s.title}</span>
-                <span className="ml-2 text-[10px] uppercase tracking-wider text-muted/70">
-                  {s.level}
-                </span>
-              </button>
-            ))}
-          </div>
-          <div>STORY VIEW STUB</div>
+          {stories.length === 0 ? (
+            <EmptyStateLine label="story" />
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {stories.map((s, i) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setStoryIdx(i)}
+                    className={`press rounded-xl border px-4 py-2 text-left transition-colors ${
+                      storyIdx === i
+                        ? "border-accent bg-accent-soft text-foreground"
+                        : "border-line bg-panel text-muted hover:border-accent/50 hover:text-foreground"
+                    }`}
+                  >
+                    <span className="font-jp text-sm">{s.title}</span>
+                    <span className="ml-2 text-[10px] uppercase tracking-wider text-muted/70">
+                      {s.level}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <StoryView key={stories[Math.min(storyIdx, stories.length - 1)].id} story={stories[Math.min(storyIdx, stories.length - 1)]} />
+            </>
+          )}
         </div>
       )}
 
       {tab === "conversation" && (
         <div className="space-y-6">
-          <div className="flex flex-wrap gap-2">
-            {conversations.map((c, i) => (
-              <button
-                key={c.id}
-                onClick={() => setConvIdx(i)}
-                className={`press rounded-xl border px-4 py-2 text-left transition-colors ${
-                  convIdx === i
-                    ? "border-accent bg-accent-soft text-foreground"
-                    : "border-line bg-panel text-muted hover:border-accent/50 hover:text-foreground"
-                }`}
-              >
-                <span className="font-jp text-sm">{c.title}</span>
-                <span className="ml-2 text-[10px] uppercase tracking-wider text-muted/70">
-                  {c.level}
-                </span>
-              </button>
-            ))}
-          </div>
-          <div>CONVO VIEW STUB</div>
+          {conversations.length === 0 ? (
+            <EmptyStateLine label="conversation" />
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {conversations.map((c, i) => (
+                  <button
+                    key={c.id}
+                    onClick={() => setConvIdx(i)}
+                    className={`press rounded-xl border px-4 py-2 text-left transition-colors ${
+                      convIdx === i
+                        ? "border-accent bg-accent-soft text-foreground"
+                        : "border-line bg-panel text-muted hover:border-accent/50 hover:text-foreground"
+                    }`}
+                  >
+                    <span className="font-jp text-sm">{c.title}</span>
+                    <span className="ml-2 text-[10px] uppercase tracking-wider text-muted/70">
+                      {c.level}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <ConversationView key={conversations[Math.min(convIdx, conversations.length - 1)].id} conversation={conversations[Math.min(convIdx, conversations.length - 1)]} />
+            </>
+          )}
         </div>
       )}
+    </div>
+  );
+}
+
+function EmptyStateLine({ label }: { label: string }) {
+  return (
+    <div className="rounded-2xl border border-line bg-panel px-6 py-12 text-center text-sm text-muted">
+      {label === "story"
+        ? "No stories available for this level yet."
+        : "No conversations available for this level yet."}
     </div>
   );
 }

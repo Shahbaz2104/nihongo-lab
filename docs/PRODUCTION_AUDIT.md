@@ -3,6 +3,12 @@
 Date: 2026-08-14
 Baseline: `be75e23` — all four gates pass (`npm test` 8/8, `npm run lint`, `npx tsc --noEmit`, `npm run build`).
 
+> **Status (2026-08-30):** all P0/P1/P2 findings in this report have been resolved and verified.
+> The StoryReader tab regression, corrupted apostrophes, non-transactional review write, missing
+> "again" re-queue, mutating-route auth gap, vocab payload waste, listening O(n²), dotted kunyomi,
+> and StrokeOrder timeout/cache issues documented in `docs/FIX_PLAN.md` are also now fixed. Gates:
+> `npm test` 72/72, `npm run lint`, `npx tsc --noEmit`, `npm run build` (proxy auth registered) — all green.
+
 Severity key: **P0** = crash/corruption, **P1** = broken flow / correctness / a11y, **P2** = polish.
 
 ---

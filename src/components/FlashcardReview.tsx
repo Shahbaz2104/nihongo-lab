@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Cards } from "@phosphor-icons/react";
 import { api, type Grade, type ReviewCard } from "@/lib/api";
@@ -22,6 +22,9 @@ interface Props {
 
 const gradeOrder: Grade[] = ["again", "hard", "good", "easy"];
 
+const MAX_REQUEUES = 2;
+const SESSION_CAP = 40;
+
 const gradeStyles: Record<Grade, string> = {
   again: "border-bad/25 bg-bad/10 text-bad hover:bg-bad/15",
   hard: "border-gold/25 bg-gold/10 text-gold hover:bg-gold/15",
@@ -38,13 +41,13 @@ const gradeLabels: Record<Grade, { jp: string; en: string }> = {
 
 export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete }: Props) {
   const [queue, setQueue] = useState<ReviewCard[]>([]);
-  const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [done, setDone] = useState(false);
   const [session, setSession] = useState({ reviewed: 0, correct: 0 });
   const [submitting, setSubmitting] = useState(false);
+  const requeueCount = useRef(new Map<string, number>());
   const reduce = useReducedMotion();
 
   useEffect(() => {
@@ -68,7 +71,7 @@ export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete
     };
   }, [type, level, limit]);
 
-  const card = queue[index];
+  const card = queue[0];
 
   const speak = useCallback(() => {
     if (!card) return;
@@ -84,17 +87,26 @@ export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete
       try {
         await api.review(card.id, g);
         setSession((s) => ({ reviewed: s.reviewed + 1, correct: s.correct + (g !== "again" ? 1 : 0) }));
-        if (index + 1 >= queue.length) {
+        setQueue((q) => {
+          const remaining = q.filter((c) => c.id !== card.id);
+          if (g !== "again") return remaining;
+          const n = requeueCount.current.get(card.id) ?? 0;
+          const capOk = remaining.length + 1 <= SESSION_CAP;
+          if (n < MAX_REQUEUES && capOk) {
+            requeueCount.current.set(card.id, n + 1);
+            return [...remaining, card];
+          }
+          return remaining;
+        });
+        setRevealed(false);
+        if (queue.length <= 1 && g !== "again") {
           setDone(true);
-        } else {
-          setRevealed(false);
-          setIndex((i) => i + 1);
         }
       } finally {
         setSubmitting(false);
       }
     },
-    [card, index, queue.length, submitting],
+    [card, queue.length, submitting],
   );
 
   useEffect(() => {
@@ -205,10 +217,10 @@ export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete
           {type} · {level}
         </span>
         <span className="tabular-nums">
-          {index + 1} / {queue.length}
+          {session.reviewed} reviewed · {queue.length - 1} left
         </span>
       </div>
-      <ProgressBar value={(index + (revealed ? 0.5 : 0)) / queue.length} className="mb-5" />
+      <ProgressBar value={queue.length === 0 ? 0 : session.reviewed / queue.length} className="mb-5" />
 
       <div aria-live="polite" className="[perspective:1600px]">
         <motion.div

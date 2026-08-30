@@ -59,7 +59,7 @@ export function Session({ stories, conversations }: Props) {
           })}
         </ol>
         <Button className="w-full" onClick={() => setStep(0)}>
-          Start today2019s session
+          Start today&apos;s session
           <ArrowRight size={18} weight="bold" />
         </Button>
       </div>
@@ -173,7 +173,7 @@ function NewWordsStep({ level, onDone }: { level: string; onDone: () => void }) 
         <p className="mt-3 text-muted">
           {added > 0
             ? `${added} new word${added === 1 ? "" : "s"} added to your reviews.`
-            : "No new words this time — they2019ll show up once you review them."}
+            : "No new words this time — they&apos;ll show up once you review them."}
         </p>
         <Button className="mt-8" onClick={onDone}>
           Continue session

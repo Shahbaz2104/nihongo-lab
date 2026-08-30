@@ -60,6 +60,15 @@ async function j<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+const hasApiToken =
+  typeof process !== "undefined" && typeof process.env.NEXT_PUBLIC_API_TOKEN === "string";
+
+function postHeaders(): HeadersInit {
+  const h: Record<string, string> = { "Content-Type": "application/json" };
+  if (hasApiToken) h["x-api-token"] = process.env.NEXT_PUBLIC_API_TOKEN!;
+  return h;
+}
+
 export const api = {
   queue: (type: string, level: string, limit = 20) =>
     fetch(`/api/review/queue?type=${type}&level=${level}&limit=${limit}`).then((r) =>
@@ -68,7 +77,7 @@ export const api = {
   review: (cardId: string, grade: Grade) =>
     fetch("/api/review", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: postHeaders(),
       body: JSON.stringify({ cardId, grade }),
     }).then((r) => j<{ ok: boolean }>(r)),
   addCard: (input: {
@@ -81,7 +90,7 @@ export const api = {
   }) =>
     fetch("/api/cards", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: postHeaders(),
       body: JSON.stringify(input),
     }).then((r) => j<{ ok: boolean; id: string; created: boolean }>(r)),
   quiz: (type: string, level: string, n = 10, direction?: string) =>

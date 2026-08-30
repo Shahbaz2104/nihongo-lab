@@ -16,18 +16,25 @@ function toCode(character: string) {
   return character.codePointAt(0)!.toString(16).padStart(5, "0");
 }
 
+const pathsCache = new Map<string, string[]>();
+
 export function StrokeOrder({ character }: { character: string }) {
-  const [paths, setPaths] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [paths, setPaths] = useState<string[]>(() => pathsCache.get(character) ?? []);
+  const [loading, setLoading] = useState(() => !pathsCache.has(character));
   const [error, setError] = useState(false);
   const [progress, setProgress] = useState(0);
   const [playing, setPlaying] = useState(false);
   const reduce = useReducedMotion();
 
   useEffect(() => {
-    let alive = true;
+    if (pathsCache.has(character)) return;
 
-    fetch(`https://raw.githubusercontent.com/KanjiVG/kanjivg/master/kanji/${toCode(character)}.svg`)
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 10000);
+
+    fetch(`https://raw.githubusercontent.com/KanjiVG/kanjivg/master/kanji/${toCode(character)}.svg`, {
+      signal: controller.signal,
+    })
       .then((r) => {
         if (!r.ok) throw new Error("not found");
         return r.text();
@@ -37,20 +44,19 @@ export function StrokeOrder({ character }: { character: string }) {
         const found = Array.from(doc.querySelectorAll("path")).map((p) =>
           p.getAttribute("d"),
         ) as string[];
-        if (alive) {
-          setPaths(found);
-          setLoading(false);
-        }
+        pathsCache.set(character, found);
+        setPaths(found);
+        setLoading(false);
       })
       .catch(() => {
-        if (alive) {
-          setError(true);
-          setLoading(false);
-        }
-      });
+        setError(true);
+        setLoading(false);
+      })
+      .finally(() => window.clearTimeout(timeout));
 
     return () => {
-      alive = false;
+      controller.abort();
+      window.clearTimeout(timeout);
     };
   }, [character]);
 

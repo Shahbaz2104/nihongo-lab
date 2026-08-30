@@ -8,7 +8,9 @@ export default function VocabPage() {
       l,
       getVocab(l).map((v) => ({
         ...v,
-        examples: (v.examples ?? []).map((ex) => ({ ...ex, ...annotate(ex.ja) })),
+        examples: (v.examples ?? []).map((ex, i) =>
+          i === 0 ? { ...ex, ...annotate(ex.ja) } : { ...ex, tokens: [], romaji: "" },
+        ),
       })),
     ]),
   );

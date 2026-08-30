@@ -181,6 +181,10 @@ npm run datasets:check # validate bundled datasets + report update dates
   visitor's installed Japanese voice. The app degrades silently if speech is unavailable.
 - **Kanji stroke-order** is the only feature needing the network (KanjiVG SVGs fetched at
   runtime); everything else works offline after the initial page load.
+- **Mutating API routes** (`POST /api/review`, `POST /api/cards`) are guarded by a shared-secret
+  header check in `src/proxy.ts` (Next 16's Proxy). Set `API_TOKEN` in the server environment to
+  require `x-api-token` on those POSTs; deploy pages read it via `NEXT_PUBLIC_API_TOKEN`. In local
+  development with no token set, the proxy passes every request through.
 
 ---
 

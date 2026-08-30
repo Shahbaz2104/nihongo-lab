@@ -42,23 +42,27 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Not enough sentences" }, { status: 422 });
   }
 
+  // Tokenize each sentence once, then reuse across all targets instead of
+  // re-tokenizing the whole pool for every target (avoids O(n²) work).
+  const sentenceTokens = new Map<string, Set<string>>();
+  for (const o of items) {
+    const s = o.examples[0].ja;
+    if (!sentenceTokens.has(s)) sentenceTokens.set(s, contentTokens(s));
+  }
+
   const targets = seededShuffle(items, rng).slice(0, n);
 
   const questions = targets.map((item) => {
     const jp = item.examples[0].ja;
     const en = item.examples[0].en ?? "";
-    const targetTokens = contentTokens(jp);
+    const targetTokens = sentenceTokens.get(jp)!;
 
-    const byText = new Map<string, number>();
-    for (const o of items) {
-      const s = o.examples[0].ja;
+    const scored: { sentence: string; overlap: number }[] = [];
+    for (const [s, tokens] of sentenceTokens) {
       if (s === jp) continue;
-      byText.set(s, countOverlap(targetTokens, contentTokens(s)));
+      scored.push({ sentence: s, overlap: countOverlap(targetTokens, tokens) });
     }
-    const pool = [...byText.entries()]
-      .map(([sentence, overlap]) => ({ sentence, overlap }))
-      .sort((a, b) => b.overlap - a.overlap)
-      .slice(0, 3);
+    const pool = scored.sort((a, b) => b.overlap - a.overlap).slice(0, 3);
     const distractors = seededShuffle(pool, rng).map((c) => c.sentence);
 
     const options = seededShuffle([...distractors, jp], rng);

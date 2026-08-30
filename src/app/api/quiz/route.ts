@@ -39,6 +39,11 @@ const DIRECTIONS: Record<string, string[]> = {
   grammar: ["m"],
 };
 
+/** Normalize dictionary dotted readings (た.べる → たべる) like the tokenizer does. */
+function normalizeReading(r: string | undefined): string {
+  return (r ?? "").replace(/[・.]/g, "");
+}
+
 export async function GET(req: NextRequest) {
   const type = req.nextUrl.searchParams.get("type") ?? "vocab";
   const level = (req.nextUrl.searchParams.get("level") ?? "N5").toUpperCase();
@@ -90,10 +95,10 @@ export async function GET(req: NextRequest) {
     if (dir === "kr") {
       const base = picked.map((i) => ({
         prompt: i.character,
-        answer: i.onyomi[0] ?? i.kunyomi[0] ?? i.character,
+        answer: normalizeReading(i.onyomi[0] ?? i.kunyomi[0] ?? i.character),
         alt: i.meanings[0] ?? null,
       }));
-      const readings = items.flatMap((i) => [i.onyomi[0], i.kunyomi[0]]);
+      const readings = items.flatMap((i) => [normalizeReading(i.onyomi[0]), normalizeReading(i.kunyomi[0])]);
       questions = withDistractors(base, readings, rng);
     } else {
       const base = picked.map((i) => ({
