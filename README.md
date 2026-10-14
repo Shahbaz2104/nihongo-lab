@@ -1,5 +1,10 @@
 # Nihongo Lab 日本語ラボ
 
+[![CI](https://github.com/Shahbaz2104/nihongo-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/Shahbaz2104/nihongo-lab/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-e8603f.svg)](LICENSE)
+
+**Live demo → [nihongo-lab-nu.vercel.app](https://nihongo-lab-nu.vercel.app)**
+
 An all-in-one Japanese learning lab for serious self-study — kana drills, JLPT kanji with
 animated stroke order, an 8,000+ word vocabulary deck, grammar patterns, **graded reading
 stories with word-by-word furigana**, interactive conversation practice, quizzes, listening,
@@ -361,6 +366,14 @@ Stories and conversation scripts are original, written for this project.
 
 The full per-dataset attribution (source, license, update date) is shown on the in-app
 `/about` page and documented in the repo.
+
+---
+
+## License
+
+Source code is available under the [MIT License](LICENSE). The bundled dictionary datasets
+retain their own upstream licenses (CC BY-SA / CC BY, detailed above) — MIT covers the code,
+not the data.
 
 This project is for language-learning and portfolio purposes only.
 
