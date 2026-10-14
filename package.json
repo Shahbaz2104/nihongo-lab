@@ -2,6 +2,27 @@
   "name": "nihongo-lab",
   "version": "0.1.0",
   "private": true,
+  "description": "Interactive Japanese learning lab — kana, kanji, JLPT vocab/grammar, graded stories, and a from-scratch SM-2 spaced-repetition engine.",
+  "author": "Shahbaz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shahbaz2104/nihongo-lab.git"
+  },
+  "keywords": [
+    "nextjs",
+    "react",
+    "typescript",
+    "japanese-learning",
+    "jlpt",
+    "spaced-repetition",
+    "srs",
+    "sm-2",
+    "prisma",
+    "sqlite",
+    "tailwindcss",
+    "flashcards"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",

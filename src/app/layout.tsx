@@ -30,6 +30,15 @@ const notoSerifJp = Noto_Serif_JP({
 export const metadata: Metadata = {
   title: "Nihongo Lab",
   description: "Interactive Japanese learning lab — kana, kanji, vocab, grammar, and spaced repetition.",
+  metadataBase: new URL("https://nihongo-lab-nu.vercel.app"),
+  openGraph: {
+    siteName: "Nihongo Lab",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export const viewport: Viewport = {
