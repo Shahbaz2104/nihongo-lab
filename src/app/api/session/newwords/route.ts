@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getVocab, JLPT_LEVELS, type JlptLevel } from "@/lib/datasets";
 import { db } from "@/lib/db";
+import { mulberry32, seededShuffle } from "@/lib/random";
+import { dayKey } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -16,18 +18,25 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Invalid n" }, { status: 400 });
   }
 
+  // Deterministic pick: optional seed for tests, otherwise stable for the day.
+  const seedRaw = req.nextUrl.searchParams.get("seed");
+  const seed = seedRaw !== null ? Number(seedRaw) : Number(dayKey(new Date()).replaceAll("-", ""));
+  const rng = mulberry32(Number.isFinite(seed) ? seed : 0);
+
   const [items, existing] = await Promise.all([
     Promise.resolve(getVocab(level as JlptLevel)),
+    // Level-agnostic: a word that already has a card (added from a story at
+    // any level) is not new — matches how /api/stats counts new words.
     db.card.findMany({
-      where: { type: "vocab", level },
+      where: { type: "vocab" },
       select: { sourceId: true },
     }),
   ]);
   const seen = new Set(existing.map((c) => c.sourceId));
-  const unseen = items
-    .filter((i) => !seen.has(i.word))
-    .sort(() => Math.random() - 0.5)
-    .slice(0, Math.min(Math.floor(n), 10));
+  const unseen = seededShuffle(
+    items.filter((i) => !seen.has(i.word)),
+    rng,
+  ).slice(0, Math.min(Math.floor(n), 10));
 
   return NextResponse.json({
     words: unseen.map((i) => ({

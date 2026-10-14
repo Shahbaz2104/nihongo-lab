@@ -173,14 +173,17 @@ export function FlashcardReview({ type, level, limit = 20, onRestart, onComplete
   }
 
   if (done || queue.length === 0) {
-    const pct = queue.length === 0 ? null : Math.round((session.correct / Math.max(1, session.reviewed)) * 100);
+    // Session finished (reviewed > 0) shows the accuracy summary; an empty
+    // queue before any review is the "nothing due" state.
+    const completed = session.reviewed > 0;
+    const pct = completed ? Math.round((session.correct / session.reviewed) * 100) : null;
     return (
       <div className="mx-auto max-w-lg rounded-2xl border border-line bg-panel px-6 py-14 text-center shadow-warm">
         <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-accent-soft">
           <Cards size={32} weight="duotone" className="text-accent" />
         </div>
         <div className="font-display text-4xl font-bold text-foreground">
-          {queue.length === 0 ? "終了" : "おつかれさま"}
+          {completed ? "おつかれさま" : "終了"}
         </div>
         {pct !== null ? (
           <>

@@ -70,6 +70,16 @@ The result: large dataset files never cross the wire; the client only receives t
 - **Integration**: full queue → grade → log → day-stat flow against the real SQLite DB in tests.
 - Run everything with `npm test` (Vitest), `npm run lint`, `npx tsc --noEmit`, `npm run build`.
 
+## API trust model
+
+The app is **local-first and single-user**: no login, cookies, or tenancy — one shared SQLite file. The API guard reflects that posture:
+
+- `src/proxy.ts` (Next.js 16's request interception, the successor to middleware) optionally gates `POST /api/review` and `POST /api/cards` behind an `x-api-token` header. The gate only activates when the `API_TOKEN` env var is set; without it, requests pass through untouched (development default).
+- The browser client sends the token from `NEXT_PUBLIC_API_TOKEN` (`src/lib/api.ts`), which is inlined into the JS bundle — so the token is **client-visible by design**. It deters accidental misuse; it is not a server-side secret and must not be treated as one.
+- `GET /api/review/queue` **mutates state**: it backfills missing cards for the requested level. It sits outside the gate, which is consistent with the single-user model but means the endpoint is not safe to expose to untrusted networks.
+
+For any deployment beyond localhost, either set `API_TOKEN` **and** extend the gate to the queue GET (sending the header on all client fetches), or place the app behind real authentication (reverse proxy, VPN, or a future multi-user auth layer).
+
 ## Known limitations
 
 - **Web Speech voices vary by OS/browser** — synthesis quality depends on the installed Japanese voice; the app degrades gracefully (silent no-op) when unavailable.

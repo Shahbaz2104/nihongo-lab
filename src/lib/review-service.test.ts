@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { db } from "./db";
 import { getReviewQueue, submitReview } from "./review-service";
-import { getKana } from "./datasets";
+import { getKana, getVocab } from "./datasets";
+import { newCardState } from "./srs";
 import { dayKey } from "./dates";
 
 const KANA = getKana().length;
@@ -74,6 +75,61 @@ describe("review queue — kana", () => {
       expect(reviewsDelta).toBe(1);
     } finally {
       await clearKanaCards();
+    }
+  });
+});
+
+describe("review queue — level-null cards", () => {
+  it("does not re-create a level-null card whose sourceId is in the dataset", async () => {
+    // Pick an N1 dataset word that has no card yet, so the fixture itself
+    // never trips the unique constraint it is testing.
+    const snapshot = await db.card.findMany({ where: { type: "vocab" }, select: { id: true, sourceId: true } });
+    const known = new Set(snapshot.map((c) => c.id));
+    const taken = new Set(snapshot.map((c) => c.sourceId));
+    const word = getVocab("N1").find((v) => !taken.has(v.word))?.word;
+    expect(word).toBeDefined();
+    if (!word) return;
+
+    // Simulates "Add to review" from the story reader: HoverText posts no
+    // level, so the card is stored with level null. Due epoch keeps it first
+    // in the queue regardless of how many other cards exist.
+    const state = newCardState();
+    const nullCard = await db.card.create({
+      data: {
+        sourceId: word,
+        type: "vocab",
+        front: word,
+        back: "test fixture",
+        reading: null,
+        level: null,
+        status: state.status,
+        ease: state.ease,
+        interval: state.interval,
+        reps: state.reps,
+        lapses: state.lapses,
+        due: new Date(0),
+      },
+    });
+
+    try {
+      // The old level-filtered existence check missed the null-level row,
+      // tried to insert `word` again, and failed on
+      // @@unique([type, sourceId]) — the whole queue request 500'd.
+      const queue = await getReviewQueue("vocab", "N1", 5);
+      expect(queue.length).toBe(5);
+
+      // The user-added card is reviewable, not a dead row.
+      expect(queue.some((c) => c.id === nullCard.id)).toBe(true);
+
+      // Exactly one card for that sourceId exists afterwards.
+      const count = await db.card.count({ where: { type: "vocab", sourceId: word } });
+      expect(count).toBe(1);
+    } finally {
+      // Remove everything created during the test (fixture + backfilled rows).
+      const after = await db.card.findMany({ where: { type: "vocab" }, select: { id: true } });
+      for (const c of after) {
+        if (!known.has(c.id)) await db.card.delete({ where: { id: c.id } });
+      }
     }
   });
 });

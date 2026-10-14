@@ -1,6 +1,5 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { StatsDashboard } from "@/components/StatsDashboard";
+import { readJson } from "@/lib/datasets";
 
 interface StoryRaw {
   id: string;
@@ -8,8 +7,7 @@ interface StoryRaw {
 }
 
 export default function StatsPage() {
-  const stories = readFileSync(path.join(process.cwd(), "data", "stories.json"), "utf8");
-  const storiesParsed = JSON.parse(stories) as StoryRaw[];
+  const storiesParsed = readJson<StoryRaw[]>("stories.json");
 
   return <StatsDashboard stories={storiesParsed.map((s) => ({ id: s.id, sentences: s.sentences.length }))} />;
 }

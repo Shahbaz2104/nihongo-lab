@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   BookOpen,
   Books,
+  CalendarCheck,
   Cards,
   ChartBar,
   Ear,
@@ -26,6 +27,7 @@ const links = [
   { href: "/stories", label: "Stories", kanji: "物語", icon: BookOpen },
   { href: "/grammar", label: "Grammar", kanji: "文法", icon: ListDashes },
   { href: "/quiz", label: "Quiz", kanji: "クイズ", icon: Trophy },
+  { href: "/session", label: "Session", kanji: "セッション", icon: CalendarCheck },
   { href: "/listening", label: "Listening", kanji: "聞き取り", icon: Ear },
   { href: "/stats", label: "Stats", kanji: "統計", icon: ChartBar },
 ];

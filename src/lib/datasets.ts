@@ -41,7 +41,7 @@ export interface KanaItem {
   group: string;
 }
 
-function readJson<T>(rel: string): T {
+export function readJson<T>(rel: string): T {
   const file = readFileSync(path.join(process.cwd(), "data", rel), "utf8");
   return JSON.parse(file) as T;
 }

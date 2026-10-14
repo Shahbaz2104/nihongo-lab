@@ -1,7 +1,6 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { StoryReader, type Story, type Conversation } from "@/components/StoryReader";
 import { tokenize } from "@/lib/tokenizer";
+import { readJson } from "@/lib/datasets";
 
 interface StoryRaw {
   id: string;
@@ -23,11 +22,6 @@ interface ConversationRaw {
     correct?: number;
     options?: { jp: string; en: string }[];
   }[];
-}
-
-function readJson<T>(rel: string): T {
-  const file = readFileSync(path.join(process.cwd(), "data", rel), "utf8");
-  return JSON.parse(file) as T;
 }
 
 export default function StoriesPage() {

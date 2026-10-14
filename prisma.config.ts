@@ -6,6 +6,7 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: "file:./dev.db",
+    // Keep in sync with src/lib/db.ts (same default, single env override).
+    url: process.env.DATABASE_URL ?? "file:./dev.db",
   },
 });

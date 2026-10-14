@@ -18,7 +18,7 @@ export function HoverText({
   romaji?: boolean;
 }) {
   const [open, setOpen] = useState<number | null>(null);
-  const [saved, setSaved] = useState<number | null>(null);
+  const [saveState, setSaveState] = useState<Record<number, "saving" | "saved" | "error">>({});
   const rootRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -33,6 +33,8 @@ export function HoverText({
   }, [open]);
 
   const addToReview = async (t: Token, i: number) => {
+    if (saveState[i] === "saving" || saveState[i] === "saved") return;
+    setSaveState((s) => ({ ...s, [i]: "saving" }));
     try {
       await api.addCard({
         type: "vocab",
@@ -41,9 +43,10 @@ export function HoverText({
         back: t.meanings.join("; ") || t.reading,
         reading: t.reading,
       });
-      setSaved(i);
+      setSaveState((s) => ({ ...s, [i]: "saved" }));
     } catch {
-      setSaved(-1);
+      // Per-token failure: other words stay usable, this one can retry.
+      setSaveState((s) => ({ ...s, [i]: "error" }));
     }
   };
 
@@ -60,6 +63,7 @@ export function HoverText({
             : "left-1/2 -translate-x-1/2";
 
         const isOpen = open === i;
+        const st = saveState[i];
 
         return (
           <span key={i} className="group/word relative mx-0.5 inline-block">
@@ -113,17 +117,24 @@ export function HoverText({
                   e.stopPropagation();
                   addToReview(t, i);
                 }}
-                disabled={saved === i || saved === -1}
+                disabled={st === "saving" || st === "saved"}
+                aria-live="polite"
                 className={`mt-2 flex min-h-10 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold transition-colors ${
-                  saved === i
+                  st === "saved"
                     ? "border-good/40 bg-good/10 text-good"
-                    : saved === -1
-                      ? "cursor-not-allowed border-red-500/40 text-bad"
+                    : st === "error"
+                      ? "border-bad/40 bg-bad/10 text-bad hover:bg-bad/15"
                       : "border-line bg-panel text-foreground hover:border-accent"
                 }`}
               >
                 <Plus size={14} weight="bold" />
-                {saved === i ? "Added to review" : saved === -1 ? "Failed" : "Add to review"}
+                {st === "saved"
+                  ? "Added to review"
+                  : st === "error"
+                    ? "Failed — retry"
+                    : st === "saving"
+                      ? "Adding…"
+                      : "Add to review"}
               </button>
             </span>
           </span>

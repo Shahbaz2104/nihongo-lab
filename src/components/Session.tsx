@@ -28,6 +28,7 @@ const steps = [
 export function Session({ stories, conversations }: Props) {
   const [level, setLevel] = useState("N5");
   const [step, setStep] = useState(-1);
+  const [reviewKey, setReviewKey] = useState(0);
 
   if (step === -1) {
     return (
@@ -103,7 +104,14 @@ export function Session({ stories, conversations }: Props) {
       </header>
 
       {step === 0 && (
-        <FlashcardReview type="vocab" level={level} limit={10} onComplete={() => setStep(1)} onRestart={() => setStep(1)} />
+        <FlashcardReview
+          key={reviewKey}
+          type="vocab"
+          level={level}
+          limit={10}
+          onComplete={() => setStep(1)}
+          onRestart={() => setReviewKey((k) => k + 1)}
+        />
       )}
       {step === 1 && <NewWordsStep key={level} level={level} onDone={() => setStep(2)} />}
       {step === 2 && (

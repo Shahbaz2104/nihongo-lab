@@ -63,17 +63,39 @@ function datasetEntries(type: CardType, level?: JlptLevel): DatasetEntry[] {
   }
 }
 
+/** Unique-constraint violation (Prisma P2002, or the raw SQLite message). */
+function isUniqueViolation(e: unknown): boolean {
+  if (typeof e !== "object" || e === null) return false;
+  const code = "code" in e ? (e as { code?: unknown }).code : undefined;
+  if (code === "P2002") return true;
+  const message = "message" in e ? String((e as { message?: unknown }).message) : "";
+  return message.includes("UNIQUE constraint failed");
+}
+
 export async function getReviewQueue(type: CardType, level: JlptLevel, limit = 20) {
   const entries = datasetEntries(type, level);
-  // Kana has no JLPT level: its cards must be matched regardless of the level
-  // parameter, otherwise re-queueing at a different level re-creates every
-  // kana card and violates the unique constraint on [type, sourceId].
+  const entryIds = entries.map((e) => e.sourceId);
+
+  // [type, sourceId] is unique across the whole table, so existence must be
+  // checked for every card of this type regardless of level — including cards
+  // created at another level and level-null cards added from the story reader.
+  // Filtering by level here used to re-insert those cards and fail the whole
+  // request on the unique constraint.
+  const present = await db.card.findMany({
+    where: { type, sourceId: { in: entryIds } },
+    select: { sourceId: true },
+  });
+  const presentSources = new Set(present.map((c) => c.sourceId));
+
+  // The queue itself stays level-scoped, plus level-null cards (kana and
+  // story-added words), which belong to every level. Kana has no JLPT level:
+  // its cards must be matched regardless of the level parameter, otherwise
+  // re-queueing at a different level re-creates every kana card.
   const existing = await db.card.findMany({
-    where: type === "kana" ? { type } : { type, level },
+    where: type === "kana" ? { type } : { type, OR: [{ level }, { level: null }] },
     orderBy: { due: "asc" },
   });
 
-  const existingBySource = new Map(existing.map((c) => [c.sourceId, c]));
   const now = new Date();
 
   const due = existing
@@ -81,7 +103,7 @@ export async function getReviewQueue(type: CardType, level: JlptLevel, limit = 2
     .sort((a, b) => a.due.getTime() - b.due.getTime());
 
   const newNeeded = Math.max(0, limit - due.length);
-  const missing = entries.filter((e) => !existingBySource.has(e.sourceId)).slice(0, newNeeded);
+  const missing = entries.filter((e) => !presentSources.has(e.sourceId)).slice(0, newNeeded);
 
   const created: typeof existing = [];
   if (missing.length > 0) {
@@ -104,10 +126,23 @@ export async function getReviewQueue(type: CardType, level: JlptLevel, limit = 2
         due: state.due,
       };
     });
-    await db.card.createMany({ data: rows });
+    try {
+      await db.card.createMany({ data: rows });
+    } catch (e) {
+      // Concurrent queue requests can race the backfill; SQLite has no
+      // skipDuplicates, so retry row by row and tolerate already-inserted rows.
+      if (!isUniqueViolation(e)) throw e;
+      for (const row of rows) {
+        try {
+          await db.card.create({ data: row });
+        } catch (rowError) {
+          if (!isUniqueViolation(rowError)) throw rowError;
+        }
+      }
+    }
     const ids = rows.map((r) => r.sourceId);
     const inserted = await db.card.findMany({
-      where: type === "kana" ? { type, sourceId: { in: ids } } : { type, level, sourceId: { in: ids } },
+      where: { type, sourceId: { in: ids } },
     });
     created.push(...inserted);
   }
@@ -202,11 +237,13 @@ export async function submitReview(cardId: string, grade: Grade) {
       create: {
         date: dayKey(now),
         reviews: 1,
-        learned: result.correct && card.status === 0 ? 1 : 0,
+        // "Learned" = first correct answer on a card (reps 0 → 1), matching
+        // how /api/stats counts cards with reps >= 1.
+        learned: result.correct && card.reps === 0 ? 1 : 0,
       },
       update: {
         reviews: { increment: 1 },
-        ...(result.correct && card.status === 0 ? { learned: { increment: 1 } } : {}),
+        ...(result.correct && card.reps === 0 ? { learned: { increment: 1 } } : {}),
       },
     }),
   ]);
